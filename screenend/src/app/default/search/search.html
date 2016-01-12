@@ -1,0 +1,13 @@
+<div style="text-align:center;margin-top:30px;background:white;">
+  <!--<a style="border:1px solid black;margin:0px 0px 10px 0px;display:inline-block;" ng-click="search()">SEARCH</a>-->
+  <form ng-submit="search()">
+    <input ng-model="url" type="textarea" style="width:80%;border:1px solid black;font-size:20px;margin:0 10%;" />
+  </form>
+  <div style="background:grey" masonry>
+    <div class="masonry-brick" ng-repeat="item in items" style="width:8%;float:left;">
+        <div style="margin:5px;">
+          <img ng-src="{{item.cover.url}}?imageView2/2/w/100" style="width:100%;height:auto;">
+        </div>
+    </div>
+  </div>
+</div>

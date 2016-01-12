@@ -1,0 +1,87 @@
+<div id="slider" class="slide-in"  hm-tap="commentPoint($event)">
+
+<h2 id='gradient' ng-style="{'magin':10,'font-size':'18px','color':'white','position':'relative','text-align':'center','padding':'10px','z-index':2}">长按留下您希望评论的地方</h2>
+ 
+<div ng-if='artObject' ng-style="{'background-image':'url(\''+artObject.cover.url+'?imageView2/2/w/320\')',width:'100%',height:'100%','top':'0', position:'absolute','z-index':1}">
+</div>
+
+</div>
+
+<div ng-style="{'left':pressPos[0]-80+'px','top':pressPos[1]-45 + 'px',position:'absolute','z-index':1}">
+<button class='box' ui-sref=".commentInput" ng-click="click('comment')" ng-model="pressPos"><span ng-style="{'font-family':'helvetica','font-size':'20px','color':'white'}">{{label}}</span></button>
+</div>
+
+<div ng-style="{'left':pressPos[0]-10+'px','top':pressPos[1]-11+'px',position:'absolute','z-index':1}">
+<div class='arrow'></div>
+</div>
+ 
+<button ng-model="pressPos" ng-style="{ 'background':'url(visuals/grid/icon/round.svg) no-repeat','border':'0px','left':pressPos[0]-5+'px','top':pressPos[1]-2 + 'px', 'width':'10px', 'height':'10px',position:'absolute','z-index':1}"></button>
+ 
+<style>
+ 
+#gradient{
+background:-webkit-gradient(linear, 0 0, 0 bottom, from(grey), to(rgba(255,255,255, 0))); 
+}
+
+.box{
+    display: inline-block;
+    width: 160px;
+    position: absolute;
+    padding: 5px;
+    border:0px;
+    text-align: center;
+    background-color:rgba(0,0,0,0.7);
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    color: white;
+}
+
+.arrow {
+    padding-left: -20px;
+    opacity:0.7;
+    position: absolute;
+    border-style: solid;
+    border-width: 10px 10px 0;
+    border-color: #000000 transparent;
+    display: block;
+    width: 0;
+    z-index: 1;
+    bottom: -10px;
+    left: 50%;
+}
+
+ #slider {
+    width: 100%;
+    height: 100%;
+    margin-top:-20px;
+    transform: translateY(100%);
+    -webkit-transform: translateY(100%);
+}
+.slide-in {
+    animation: slide-in 0.5s forwards;
+    -webkit-animation: slide-in 0.5s forwards;
+
+}
+.slide-out {
+    animation: slide-out 0.5s forwards;
+    -webkit-animation: slide-out 0.5s forwards;
+}
+   
+@keyframes slide-in {
+    100% { transform: translateY(0%); }
+}
+@-webkit-keyframes slide-in {
+    100% { -webkit-transform: translateY(0%); }
+}
+    
+@keyframes slide-out {
+    0% { transform: translateY(0%); }
+    100% { transform: translateY(-100%); }
+}
+
+@-webkit-keyframes slide-out {
+    0% { -webkit-transform: translateY(0%); }
+    100% { -webkit-transform: translateY(-100%); }
+}
+</style>

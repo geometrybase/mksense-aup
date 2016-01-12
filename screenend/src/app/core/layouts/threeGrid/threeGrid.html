@@ -1,0 +1,80 @@
+<style>
+
+.front, .back{
+position:absolute;
+-webkit-backface-visibility: hidden;
+backface-visibility: hidden;
+transition: -webkit-transform .5s ease-in-out 0s, width 0.2s, height 0.2s;
+transition: transform .5s ease-in-out 0s, width 0.2s, height 0.2s;
+cursor: default;
+}
+
+.front{
+background-size: contain;
+background-repeat: no-repeat;
+background-position: center;
+-webkit-transform: translate3d(-50%,-50%,0) perspective( 600px ) rotateY( 0deg );
+transform: translate3d(-50%,-50%,0) perspective( 600px ) rotateY( 0deg );
+}
+
+.back{
+background-size: contain;
+background-repeat: no-repeat;
+background-position: center;
+-webkit-transform: translate3d(-50%,-50%,0) scale(0.2) perspective( 600px ) rotateY( 180deg );
+transform:translate3d(-50%,-50%,0) scale(0.2) perspective( 600px ) rotateY( 180deg );
+}
+
+.element {
+}
+
+.element.flipped{
+z-index:100000;
+}
+
+.element.flipped .front {
+-webkit-transform: translate3d(-50%,-50%,0) perspective( 2000px ) rotateY( -180deg );
+transform: translate3d(-50%,-50%,0) perspective( 2000px ) rotateY( -180deg );
+}
+
+.element.flipped .back {
+-webkit-transition-delay: .0s; /* Safari */
+transition-delay: .0s;
+-webkit-transform:translate3d(-50%,-50%,0)  scale(1) perspective( 2000px ) rotateY( 0deg );
+transform:translate3d(-50%,-50%,0) scale(1) perspective( 2000px ) rotateY( 0deg );
+}
+
+.element .number {
+position: absolute;
+top: 0px;
+right: 0px;
+font-size: 50px;
+color: rgba(255,255,255,0.75);
+}
+
+.element .details {
+position: absolute;
+bottom: 15px;
+left: 0px;
+right: 0px;
+font-size: 12px;
+color: rgba(127,255,255,0.75);
+}
+
+button {
+color: rgba(255,255,255,0.75);
+border: 0px;
+padding: 5px 10px;
+cursor: pointer;
+}
+
+button:hover {
+background-color: rgba(255,255,255,0.5);
+}
+
+button:active {
+color: #000000;
+background-color: rgba(255,255,255,0.75);
+}
+
+</style>

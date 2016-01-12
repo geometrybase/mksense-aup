@@ -1,0 +1,13 @@
+<div  class="form-login">
+    <form name="loginForm" method="post" novalidate="novalidate">
+        <h2 class="title">YOUR PASSCODE</h2>
+        <div class="form-group">
+            <input type="password" name="password" class="form-control password" placeholder="enter password" required="required" data-ng-model="credentials.passcode"/>
+        </div>
+
+        <button class="btn btn-primary btn-block"
+            data-ng-click="auth()"
+            data-ng-disabled="!loginForm.$valid"
+        >Login</button>
+    </form>
+</div>

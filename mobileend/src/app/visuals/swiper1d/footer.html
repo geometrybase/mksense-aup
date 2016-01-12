@@ -1,0 +1,168 @@
+
+<div ng-style="{'width':'100%','height':'100%'}">
+
+<button id='logo' ui-sref=".me" ng-style="{'background':'url(visuals/swiper1d/icon/logo.svg) no-repeat','background-color':'rgba(0,0,0,0.1)','background-size':'100% 100%','background-position':'center','top':'5%','right':'5%','position':'absolute','z-index':'5'}"></button>
+
+<div id='gradient' ng-style="{'color':'black','position':'absolute','width':'100%','height':'10%','bottom':'0px','left':'0px','z-index':2}">
+  
+<button ng-class='menu-like-{{isLiked}}' class='button' ng-click="like()" ng-style="{'background':'url('+poster+ ') no-repeat'}"></button>
+
+
+<span class="dropup" dropdown>
+       <button  class='button'  dropdown-toggle ng-style="{'background': 'url(visuals/swiper1d/icon/comment.svg) no-repeat','bottom':'10px'}" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
+<ul class="dropdown-menu" dropdown-menu ng-style="{'margin-bottom':'45px'}">
+      <li> 
+        <a ui-sref=".comment" ng-style="{'color':'white'}">COMMENT A</a>
+      </li>
+      <li>
+        <a ui-sref=".comment.commentinput" ng-style="{'color':'white'}">COMMENT B</a>
+      </li> 
+<div class='arrow2' ng-style="{'left':'40%','bottom':'-10px',position:'absolute','z-index':5}">
+</div>
+    </ul>
+</span>
+
+
+
+<button class='button' ng-style="{'background': 'url(visuals/swiper1d/icon/collect.svg)no-repeat'}"></button>
+
+<span class="dropup" dropdown>
+       <button  class='button'  dropdown-toggle ng-style="{'background': 'url(visuals/swiper1d/icon/share.svg) no-repeat','bottom':'10px'}" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
+<ul class="dropdown-menu" dropdown-menu ng-style="{'margin-bottom':'45px'}">
+      <li> 
+       <img ng-src="visuals/swiper1d/icon/twitter.svg" ng-style="{'margin-left':'0','bottom':'2px',position:'relative','z-index':10,'height':'25px','background-size':'cover'}"/>
+       <img ng-src="visuals/swiper1d/icon/facebook.svg" ng-style="{'margin-left':'0','bottom':'2px',position:'relative','z-index':10,'height':'25px','background-size':'cover'}"/>
+        <img ng-src="visuals/swiper1d/icon/wechat.svg" ng-style="{'margin-left':'0','bottom':'2px',position:'relative','z-index':10,'height':'25px','background-size':'cover'}"/>
+        <img ng-src="visuals/swiper1d/icon/weibo.svg" ng-style="{'margin-left':'0','bottom':'2px',position:'relative','z-index':10,'height':'25px','background-size':'cover'}"/>
+      </li> 
+<div class='arrow2' ng-style="{'left':'40%','bottom':'-10px',position:'absolute','z-index':5}">
+</div>
+    </ul>
+</span>
+
+
+<p id="info">{{likeNumber}} likes<br />100 comments <br /> 50  collects</p>
+
+</div>
+
+
+
+
+</div>
+
+<style>
+
+@font-face {
+  font-family: din;
+  src: url("http://7xlzrj.com1.z0.glb.clouddn.com/DIN%20Medium.ttf")  
+}
+
+@font-face {
+  font-family: dinLight;
+  src: url("http://7xlzrj.com1.z0.glb.clouddn.com/DIN%20Light.ttf")  
+}
+
+
+.dropup{
+
+}
+
+.dropdown-menu{
+margin-left: -75%;
+background-color: rgba(0,0,0,0.8);
+z-index: 0;
+position:absolute;
+border:none;
+color:white;
+font-size: 18px;
+text-align: center;
+}
+
+#info{
+color:#FFFFFF;
+z-index: 3;
+bottom:40px;
+left:65%;
+line-height:15px;
+margin-left:3%;
+position: relative;	
+font-family: 'dinLight';
+} 
+
+#gradient{
+
+}
+
+.box{
+    display: inline-block;
+    width: 160px;
+    height:40px;
+    position: absolute;
+    bottom: 0px;
+    border:0px;
+    text-align: center;
+    background-color: rgba(0,0,0,0.8);
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    color: white;
+}
+.arrow {
+    padding-left: -20px;
+    position: absolute;
+    border-style: solid;
+    border-width: 10px 10px 0;
+    border-color: rgba(0,0,0,0.8) transparent;
+    display: block;
+    width: 0;
+    z-index: 1;
+    bottom: -10px;
+    left: 50%;
+}
+
+.arrow2 {
+    position: absolute;
+    border-style: solid;
+    border-width: 10px 10px 0;
+    border-color: rgba(0,0,0,0.8) transparent;
+    display: block;
+    width: 0;
+    z-index: 1;
+}
+
+#logo{
+border: 0;
+height:50px;
+width:50px;
+border-radius: 50px;
+}
+
+#data{
+background-color: transparent;
+border: 0;
+margin:0;
+color: #FFFFFF;
+margin-left: 10%;
+resize:none;
+}
+
+#gradient{
+background-color: black; 
+}
+
+.button{
+background-position: center;
+background-size: cover;
+width:40px;
+height:40px;
+border:0px;
+z-index: 3;
+bottom:0px;
+margin:0;
+left:1%;
+margin-left:1%;
+position: relative;
+}
+
+
+</style>

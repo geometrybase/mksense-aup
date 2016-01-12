@@ -1,0 +1,44 @@
+body {
+  padding: 50px;
+  font: 20px/150% "Helvetica Neue", "Lucida Grande", Verdana, sans-serif;
+  color: #666;
+  background: #fcfcfc;
+}
+input,
+textarea,
+button {
+  font: inherit;
+}
+html,
+body {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+}
+body {
+  background: white;
+  font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  color: #000;
+  margin: 0 auto;
+  padding: 0;
+}
+a:link,
+a:visited,
+a:hover,
+a:active {
+  color: white;
+}
+a:hover,
+a:active {
+  opacity: 0.5;
+}
+#screen {
+  width: 100%;
+  height: 100%;
+}
+scene {
+  width: 100%;
+  height: 100%;
+  display: block;
+}

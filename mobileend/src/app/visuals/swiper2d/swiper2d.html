@@ -1,0 +1,28 @@
+<div  ng-click="toggleIcons()" ng-style="{'width':'100%','height':'100%','background':'white','position':'relative'}">  
+  <mksense-swiper2d ng-show="state.name==='scene.swiper2d'"></mksense-swiper2d>
+  <div ui-view="content" ng-style="{'width':'100%', 'height':'100%', position:'absolute'}"></div>
+</div>
+<div  ng-show="show" class="fade-in-out" ui-view="footer" ng-style="{'z-index':10,'bottom':'10px', position:'absolute'}"></div>
+<style>
+.swiper-container, .swiper-container * {
+    -webkit-backface-visibility:hidden;
+}
+mksense-swiper2d{
+  display:block;
+  width:100%;
+  height:100%;
+}
+.swiper-slide{
+  background-position:center center;
+  background-size:cover;
+  background-repeat:no-repeat;
+}
+.fade-in-out.ng-enter {
+  transition:0.5s linear all;
+  opacity:0;
+}
+.fade-in-out.ng-enter.ng-enter-active {
+  opacity:1;
+}
+</style>
+

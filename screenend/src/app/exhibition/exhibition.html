@@ -1,0 +1,7 @@
+<div ng-if="state.name==='exhibition'" style="text-align:center;">
+  <h1>{{exhibition.name}}</h1>
+  <div ng-repeat="scene in exhibition.scenes">
+    <a ui-sref="scene({exhibitionId:exhibition.id,sceneId:scene.id})" style="color:black;font-size:18px;">{{scene.name}}</a>
+  </div>
+</div>
+<div class="scene" data-ui-view="scene"></div>

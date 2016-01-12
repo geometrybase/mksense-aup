@@ -1,0 +1,8 @@
+<div ng-if="state.name==='scene'" style="text-align:center;">
+  <h1 ng-if="exhibition"><a  style="color:black;" ui-sref="exhibition({exhibitionId:exhibitionId})">EXHIBITION {{exhibition.name}}</a></h1>
+  <h1>{{scene.name}}</h1>
+  <div ng-repeat="screen in scene.screens track by $index">
+    <a ui-sref="screen({exhibitionId:exhibitionId,sceneId:scene.id,screenIndex:$index})" style="color:black;font-size:15px;">SCREEN {{$index}}</a>
+  </div>
+</div>
+<div class="screen" data-ui-view="screen"></div>

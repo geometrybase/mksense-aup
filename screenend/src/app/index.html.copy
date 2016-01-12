@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html ng-app="mksense">
+  <head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+    <title>mksense</title>
+    <!-- inject:vendor:css -->
+    <!-- endinject -->
+    <!-- inject:css -->
+    <!-- endinject -->
+  </head>
+  <body ng-style="{opacity:opacity}">
+    <div class="exhibition" data-ui-view="exhibition"></div>
+    <!-- inject:vendor:js -->
+    <!-- endinject -->
+    <!-- inject:js -->
+    <!-- endinject -->
+  </body>
+</html>

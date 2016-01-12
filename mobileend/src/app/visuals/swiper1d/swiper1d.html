@@ -1,0 +1,33 @@
+<div ng-style="{'width':'100%','height':'100%','background':'white','position':'relative'}">  
+<mksense-swiper1d ng-click="toMoreInfo()"  ng-show="state.name==='scene.swiper1d'"></mksense-swiper1d>
+
+<div ui-view="content" ng-style="{'width':'100%', 'height':'100%', position:'absolute'}"></div>
+<div ui-view="cover"  ng-show="instruction" ng-style="{'width':'100%','height':'100%','z-index':10,'bottom':'0px',position:'absolute'}"></div>
+
+<div  ng-show="show" class="fade-in-out" ui-view="footer" ng-style="{'width':'100%','height':'100%','z-index':10,'bottom':'0px'}"></div>
+
+</div>
+
+
+<style>
+.swiper-container, .swiper-container * {
+    -webkit-backface-visibility:hidden;
+}
+mksense-swiper1d{
+  width:100%;
+  height:100%;
+}
+.swiper-slide{
+  background-position:center center;
+  background-size:cover;
+  background-repeat:no-repeat;
+}
+.fade-in-out.ng-enter {
+  transition:0.5s linear all;
+  opacity:0;
+}
+.fade-in-out.ng-enter.ng-enter-active {
+  opacity:1;
+}
+</style>
+
