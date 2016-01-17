@@ -1,13 +1,13 @@
 (function(){
   'use strict';
-  angular.module('mksense.visuals.swiper1d')
+  angular.module('mksense.visuals')
   .directive('mksenseComment', [
     '$log','$window','$state',
     function($log,$window,$state,$element){
       return {
       transclude:false,
       restrict:'EA',
-      templateUrl:'/visuals/swiper1d/comment-directive.html',
+     // templateUrl:'/visuals/swiper2d/comment.html',
       link:function(scope,element,attrs){ 
  
       var logger=$log.getInstance('COMMENT-DIRECTIVE');
@@ -22,8 +22,16 @@
         scope.ShowComment=true;
        //scope.$emit('mobileComment',{type:'array',data:scope.pressPos}); 
         scope.pressPosData=[event.offsetX,event.offsetY];
-      }; 
-     }
+      };
+
+      scope.comment=function(event){
+         scope.$emit('mobileComment',{text:this.text, position:scope.pressPos}); 
+         $state.go('scene.swiper2d');//then(function(){$state.go('^')});
+         scope.text=this.text; 
+        
+       };
+        }
+
 
     };
     }]);

@@ -1,0 +1,109 @@
+<div ng-click="hideInstruction()" ng-show="instruction" style="top:0px; left:0px;width:100%;height:100%;position:absolute;background-color:rgba(0,0,0,0.8)">
+
+<p id="info" style="top:10px;left:0;width:55%;z-index:3;line-height: 30px;">Swipe up, down, left, right to select works<br/><br/><hr style="height:1px;width:60%; margin-top:50px; margin-left:10px;border-top:1px double white;" /></p>
+
+<p id="info" style="margin-top:0px;left:0;width:55%;z-index:3;line-height: 30px;"><br/><br/>touch to learn more about the piece</p>
+
+<p id="swipe">SWIPE TO START><br/><br/></p>
+ 
+<button id='swipeLogo' ng-style="{'background':'url(visuals/swiper1d/icon/swipe.svg) no-repeat','background-size':cover,'background-position':'center','z-index':'5'}"></button>
+
+<button id='touchLogo' ng-style="{'background':'url(visuals/swiper1d/icon/touch.svg) no-repeat','background-size':cover,'background-position':'center','z-index':'5'}"></button>
+
+</div>
+
+<div ng-show="instruction"  style="top:77%;left:20px;width:100%;z-index:3;position:absolute;">
+<p class="w"  style="margin-top:25px;">LIKE</p>
+<p class="w" >COMMENT</p>
+<p class="w"  style="margin-top:25px;" >COLLECT</p>
+<p class="w" >SHARE</p>
+</div>
+
+<div ng-show="instruction"  style="top:85%;left:0%;width:80%;z-index:3;line-height: 30px;position:absolute;">
+<div class="l" style="height:10px;bottom:0;"></div>
+<div class="l" style="height:25px"></div>
+<div class="l" style="height:10px;"></div>
+<div class="l" style="height:25px"></div>
+</div>
+
+
+ 
+
+<style>
+@font-face {
+  font-family: din;
+  src: url("http://7xlzrj.com1.z0.glb.clouddn.com/DIN%20Medium.ttf")  
+}
+
+@font-face {
+  font-family: dinLight;
+  src: url("http://7xlzrj.com1.z0.glb.clouddn.com/DIN%20Light.ttf")  
+}
+
+.w{
+   float:left; 
+   margin:-5px;
+   position:relative;
+   color:white;
+   font-weight: normal;
+   font-size:14px;
+   font-family: 'din';
+   text-align: center;
+}
+
+
+.l{
+   float:left; 
+   width: 1px;
+   margin:25px;
+   position:relative;
+   background:white; 
+}
+
+#swipeLogo{
+margin-left:75%;
+top:10px;
+position:absolute;
+border: 0;
+height:50px;
+width:50px;
+border-radius: 50px;
+}
+
+
+#touchLogo{
+margin-left:75%;
+top:180px;
+position:absolute;
+border: 0;
+height:50px;
+width:50px;
+border-radius: 50px;
+}
+
+#info{
+color:white;
+font-weight: normal;
+font-size:18px;
+font-family: 'din';
+text-align: left;
+position: relative;	
+}
+
+
+#swipe{
+color:white;
+width:100%;
+top:10%;
+height:20px;
+z-index: 3;
+margin:0 auto;
+font-weight: normal;
+font-size:14px;
+font-family: 'din';
+text-align: center;
+position: relative;	
+}
+
+
+</style>

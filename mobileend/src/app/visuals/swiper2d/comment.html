@@ -1,24 +1,34 @@
-<div id="slider" class="slide-in"  hm-tap="commentPoint($event)">
-
-<h2 id='gradient' ng-style="{'magin':10,'font-size':'18px','color':'white','position':'relative','text-align':'center','padding':'10px','z-index':2}">长按留下您希望评论的地方</h2>
  
-<div ng-if='artObject' ng-style="{'background-image':'url(\''+artObject.cover.url+'?imageView2/2/w/320\')',width:'100%',height:'100%','top':'0', position:'absolute','z-index':1}">
+<div ng-click="commentPoint($event)"> 
+<mksense-comment></mksense-comment>
+<h2 id='gradient' ng-style="{'margin':0,'font-size':'18px','color':'white',
+'width':'100%','position':'absolute','text-align':'center','padding':'20px','z-index':2}">长按留下您希望评论的地方</h2>
+ 
+<div class='art' ng-if='artObject' ng-style="{'background-image':'url(\''+artObject.cover.url+'?imageView2/2/w/640\')','top':'0px','z-index':1}">
 </div>
 
+<div ng-show="ShowComment" ng-style="{'left':pressPosData[0]-80+'px','top':pressPosData[1]-45 + 'px',position:'absolute','z-index':1}">
+<button class='box' ui-sref=".commentinput" ng-click="click('comment')" ng-model="pressPos"><span ng-style="{'font-family':'helvetica','font-size':'20px','color':'white'}">{{label}}</span></button>
 </div>
 
-<div ng-style="{'left':pressPos[0]-80+'px','top':pressPos[1]-45 + 'px',position:'absolute','z-index':1}">
-<button class='box' ui-sref=".commentInput" ng-click="click('comment')" ng-model="pressPos"><span ng-style="{'font-family':'helvetica','font-size':'20px','color':'white'}">{{label}}</span></button>
-</div>
-
-<div ng-style="{'left':pressPos[0]-10+'px','top':pressPos[1]-11+'px',position:'absolute','z-index':1}">
+<div  ng-show="ShowComment"  ng-style="{'left':pressPosData[0]-10+'px','top':pressPosData[1]-11+'px',position:'absolute','z-index':1}">
 <div class='arrow'></div>
 </div>
  
-<button ng-model="pressPos" ng-style="{ 'background':'url(visuals/grid/icon/round.svg) no-repeat','border':'0px','left':pressPos[0]-5+'px','top':pressPos[1]-2 + 'px', 'width':'10px', 'height':'10px',position:'absolute','z-index':1}"></button>
+<button  ng-show="ShowComment"  ng-model="pressPos" ng-style="{ 'background':'url(visuals/grid/icon/round.svg) no-repeat','border':'0px','left':pressPosData[0]-5+'px','top':pressPosData[1]-2 + 'px', 'width':'10px', 'height':'10px',position:'absolute','z-index':1}"></button>
+ 
+</div>
  
 <style>
  
+.art{
+  width:100%;
+  height:100%;
+  position:absolute;
+  background-size: 100%;
+  background-repeat:no-repeat;
+}
+
 #gradient{
 background:-webkit-gradient(linear, 0 0, 0 bottom, from(grey), to(rgba(255,255,255, 0))); 
 }
@@ -36,7 +46,6 @@ background:-webkit-gradient(linear, 0 0, 0 bottom, from(grey), to(rgba(255,255,2
     border-radius: 3px;
     color: white;
 }
-
 .arrow {
     padding-left: -20px;
     opacity:0.7;
@@ -50,7 +59,6 @@ background:-webkit-gradient(linear, 0 0, 0 bottom, from(grey), to(rgba(255,255,2
     bottom: -10px;
     left: 50%;
 }
-
  #slider {
     width: 100%;
     height: 100%;
@@ -61,7 +69,6 @@ background:-webkit-gradient(linear, 0 0, 0 bottom, from(grey), to(rgba(255,255,2
 .slide-in {
     animation: slide-in 0.5s forwards;
     -webkit-animation: slide-in 0.5s forwards;
-
 }
 .slide-out {
     animation: slide-out 0.5s forwards;
@@ -79,9 +86,9 @@ background:-webkit-gradient(linear, 0 0, 0 bottom, from(grey), to(rgba(255,255,2
     0% { transform: translateY(0%); }
     100% { transform: translateY(-100%); }
 }
-
 @-webkit-keyframes slide-out {
     0% { -webkit-transform: translateY(0%); }
     100% { -webkit-transform: translateY(-100%); }
 }
 </style>
+ 
