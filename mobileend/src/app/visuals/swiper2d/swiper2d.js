@@ -23,6 +23,10 @@
           'content@scene.swiper2d':{
             templateUrl:'/visuals/swiper2d/content.html'
           },
+          'cover@scene.swiper2d':{
+            templateUrl:'/visuals/swiper2d/cover.html',
+            controller:'Swiper2dController'
+          },
           'footer@scene.swiper2d':{
             templateUrl:'/visuals/swiper2d/footer.html'
           }
@@ -32,15 +36,32 @@
         url:'/moreinfo',
         views:{
           'content@scene.swiper2d':{
-            templateUrl:'/visuals/swiper2d/moreinfo.html'
+            templateUrl:'/visuals/swiper2d/moreinfo.html',
+            controller:'Swiper2dController'
+          },
+          'footer@scene.swiper2d':{
           }
+
+        }
+      })
+       .state('scene.swiper2d.me',{
+        url:'/me',
+        views:{
+          'content@scene.swiper2d':{
+            templateUrl:'/visuals/swiper2d/me.html',
+            controller:'Swiper2dController'
+          },
+          'footer@scene.swiper2d':{
+          }
+
         }
       })
       .state('scene.swiper2d.comment',{
         url:'/comment',
         views:{
           'content@scene.swiper2d':{
-            templateUrl:'/visuals/swiper2d/comment.html'
+             templateUrl:'/visuals/swiper2d/comment.html'
+            //template:'<mksense-comment></mksense-comment>'
           },
          'footer@scene.swiper2d':{
           }

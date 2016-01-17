@@ -1,0 +1,109 @@
+
+<div hm-pan="close()"  ng-style="{'width':'100%','height':'100%','background-color':rgba(0,0,0,0.7)}">
+
+<div id='profilepic'  ng-style="{'background':'url({{profileUrl}}) no-repeat','background-size':'cover','background-position':'center','background-color':'transparent','z-index':'5'}"></div>
+
+<div id='camera' ng-style="{'background':'url(visuals/swiper1d/icon/profile.svg) no-repeat','background-size':'100% 100%','background-position':'center','background-color':'transparent','top':'27%','left':'57%','position':'absolute','z-index':'5'}"></div>
+
+<div id='setting' ng-style="{'background':'url(visuals/swiper1d/icon/setting.svg) no-repeat','background-size':'100% 100%','background-position':'center','background-color':'transparent','top':'20%','left':'75%','position':'absolute','z-index':'5'}"></div>
+
+ <div  class='art' ng-if='artObject' ng-style="{'background-image':'url(\''+artObject.cover.url+'?imageView2/2/w/320\')','z-index':0}">
+  <div class='layer' ng-style="{'background-color':'rgba(0,0,0, 0.5)','position':'absolute','top':'0','left':'0','width':'100%','height':'100%','z-index':'5'}"></div>
+	<div id='about' ng-style="{'background':'url(visuals/swiper1d/icon/about.svg) no-repeat','background-color':'transparent','bottom':'10px','left':'5px','position':'absolute','z-index':'5'}"></div>
+</div>
+
+<div id="downloadapp"> 
+<p id="info" style="color:black;margin:auto;text-align: center;">download app for better experience</p>
+<button id='logo' ng-style="{'background':'url(visuals/swiper1d/icon/logo.svg) no-repeat','background-color':'white','background-size':'100% 100%','background-position':'center','z-index':'5'}"></button>
+<p id="info" style="color:black;margin:auto;text-align: center;"> <br/><br/><br/>learn about make sense <br/><br/> tutorial <br/><br/> SWIPE TO CLOSE ></p>
+</div>
+
+</div>
+ 
+
+<style>
+
+@font-face {
+  font-family: din;
+  src: url("http://7xlzrj.com1.z0.glb.clouddn.com/DIN%20Medium.ttf")  
+}
+
+@font-face {
+  font-family: dinLight;
+  src: url("http://7xlzrj.com1.z0.glb.clouddn.com/DIN%20Light.ttf")  
+}
+
+.layer {
+
+ 
+}
+
+#downloadapp{
+position:absolute;
+top:55%;
+width:100%;
+z-index: 10;
+}
+
+
+#logo{
+margin-left:42%;
+position:absolute;
+border: 0;
+height:50px;
+width:50px;
+border-radius: 50px;
+}
+
+#info{
+width:100%;
+z-index: 5;
+width:300px;
+margin:auto;
+font-weight: normal;
+font-size:14px;
+font-family: 'din';
+text-align: center;
+position: relative;	
+}
+
+.art{
+  width:100%;
+  height:70%;
+  top:-20%;
+  position:absolute;
+  background-size: 100%;
+  background-repeat:no-repeat;
+}
+
+#profilepic{
+border: 0;
+height:120px;
+width:120px;
+border-radius: 120px;
+margin:auto;
+position:relative;
+top:15%;
+}
+
+#camera{
+border: 0;
+height:50px;
+width:50px;
+border-radius: 40px;
+}
+
+#setting{
+border: 0;
+height:50px;
+width:50px;
+border-radius: 50px;
+}
+
+#about{
+border: 0;
+height:40px;
+width:140px;
+}
+
+</style>

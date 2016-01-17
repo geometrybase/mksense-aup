@@ -27,14 +27,14 @@
             console.log('next current',swipers[swiper.activeIndex].activeIndex);
             printSwiperIndexes();
             scope.$emit('mobileAction',{type:'right',index:swipers[swiper.activeIndex].slides[swipers[swiper.activeIndex].activeIndex].index});
-            scope.$emit('swiper2dArtObject',swipers[swiper.activeIndex].slides[swipers[swiper.activeIndex].activeIndex].artObject);
+            scope.$emit('artObject',swipers[swiper.activeIndex].slides[swipers[swiper.activeIndex].activeIndex].artObject);
           });
 
           swiper.on('slidePrevEnd',function(){
             console.log('pre current',swipers[swiper.activeIndex].activeIndex);
             printSwiperIndexes();
             scope.$emit('mobileAction',{type:'left',index:swipers[swiper.activeIndex].slides[swipers[swiper.activeIndex].activeIndex].index});
-            scope.$emit('swiper2dArtObject',swipers[swiper.activeIndex].slides[swipers[swiper.activeIndex].activeIndex].artObject);
+            scope.$emit('artObject',swipers[swiper.activeIndex].slides[swipers[swiper.activeIndex].activeIndex].artObject);
           });
 
 
@@ -44,6 +44,7 @@
             var indexes=res.payload.indexes;
             var grids=[[indexes[2],indexes[1],indexes[8]],[indexes[3],indexes[0],indexes[7]],[indexes[4],indexes[5],indexes[6]]];
             var objIndexes=[[2,1,8],[3,0,7],[4,5,6]];
+            scope.$emit('artObject',objects[0]);
             grids.forEach(function(g,index){
               swiper.appendSlide('<div class="swiper-slide"><div class="swiper-container swiper-container-v swiper-container-v-'+index+'"><div class="swiper-wrapper"></div></div></div>')
             })
@@ -68,11 +69,11 @@
             swipers.forEach(function(s){
               s.on('slideNextEnd',function(){
                 scope.$emit('mobileAction',{type:'down',index:s.slides[s.activeIndex].index});
-                scope.$emit('swiper2dArtObject',s.slides[s.activeIndex].artObject);
+                scope.$emit('artObject',s.slides[s.activeIndex].artObject);
               });
               s.on('slidePrevEnd',function(){
                 scope.$emit('mobileAction',{type:'up',index:s.slides[s.activeIndex].index});
-                scope.$emit('swiper2dArtObject',s.slides[s.activeIndex].artObject);
+                scope.$emit('artObject',s.slides[s.activeIndex].artObject);
               });
             });
           });
