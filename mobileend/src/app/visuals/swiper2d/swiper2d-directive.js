@@ -25,15 +25,16 @@
 
           swiper.on('slideNextEnd',function(){
             console.log('next current',swipers[swiper.activeIndex].activeIndex);
-            scope.$emit('mobileAction',{type:'left',index:swipers[swiper.activeIndex].slides[swipers[swiper.activeIndex].activeIndex].index});
-            scope.$emit('swiper2dArtObject',swipers[swiper.activeIndex].slides[swipers[swiper.activeIndex].activeIndex].artObject);
+            printSwiperIndexes();
+            scope.$emit('mobileAction',{type:'right',index:swipers[swiper.activeIndex].slides[swipers[swiper.activeIndex].activeIndex].index});
+            scope.$emit('artObject',swipers[swiper.activeIndex].slides[swipers[swiper.activeIndex].activeIndex].artObject);
           });
 
           swiper.on('slidePrevEnd',function(){
             console.log('pre current',swipers[swiper.activeIndex].activeIndex);
             printSwiperIndexes();
-            scope.$emit('mobileAction',{type:'right',index:swipers[swiper.activeIndex].slides[swipers[swiper.activeIndex].activeIndex].index});
-            scope.$emit('swiper2dArtObject',swipers[swiper.activeIndex].slides[swipers[swiper.activeIndex].activeIndex].artObject);
+            scope.$emit('mobileAction',{type:'left',index:swipers[swiper.activeIndex].slides[swipers[swiper.activeIndex].activeIndex].index});
+            scope.$emit('artObject',swipers[swiper.activeIndex].slides[swipers[swiper.activeIndex].activeIndex].artObject);
           });
 
 
@@ -67,11 +68,11 @@
             swipers.forEach(function(s){
               s.on('slideNextEnd',function(){
                 scope.$emit('mobileAction',{type:'down',index:s.slides[s.activeIndex].index});
-                scope.$emit('swiper2dArtObject',s.slides[s.activeIndex].artObject);
+                scope.$emit('artObject',s.slides[s.activeIndex].artObject);
               });
               s.on('slidePrevEnd',function(){
                 scope.$emit('mobileAction',{type:'up',index:s.slides[s.activeIndex].index});
-                scope.$emit('swiper2dArtObject',s.slides[s.activeIndex].artObject);
+                scope.$emit('artObject',s.slides[s.activeIndex].artObject);
               });
             });
           });
