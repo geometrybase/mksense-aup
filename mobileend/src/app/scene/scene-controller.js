@@ -11,7 +11,7 @@
       var visualTypeToViewsMap={
         grid:'scene.swiper2d',
         //grid:'scene.grid', 
-        particle:'scene.grid',
+        particle:'scene.swiper2d',
         fisheye:'scene.swiper1d'
       }
 
@@ -40,6 +40,12 @@
       $scope.socket.on('reconnect',socketConnect);
       $scope.socket.on('mobileInResponse',mobileInResponse);
       $scope.socket.on('mobileActionResponse',mobileActionResponse);
+      $scope.socket.on('ipAddress',function(data){
+        console.log(data); 
+      });
+      $scope.socket.on('error',function(err){
+        logger.error('socket error',err); 
+      });
 
       $scope.mobileAction=$scope.$on('mobileAction',function(event,data){
         logger.debug('Send action data',data);
@@ -131,4 +137,5 @@
 
 
     }]);
+
 }());

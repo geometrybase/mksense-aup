@@ -1,7 +1,7 @@
 var mkConfig={
-  socketServer:'ws://99.mksense.cn:40002/',
+  socketServer:'ws://api.mksense.cn:40002/',
   peerServer:{
-    host:'192.168.0.99',
+    host:'api.mksense.cn',
     port:40004
   },
   assetsUrl:'http://assets.mksense.cn/',

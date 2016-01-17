@@ -25,13 +25,21 @@
         self.socket.on('mobileIn',self.mobileIn);
 
         self.mobileInResponse=self.scope.$on('mobileInResponse',function(event,res){
-          logger.debug('mobileInResponse',res);
           if(!res.mobileInfo)
             return logger.error('need mobileInfo to send mobileInResponse');
           logger.debug(self.screen);
           var visualType=self.screen.scene.visuals[self.screen.visualIndex].type;
           var visualId=self.screen.scene.visuals[self.screen.visualIndex].id;
           //if mobin join in from self screen, then send back the response message
+          logger.debug('mobileInResponse',{
+            to:res.mobileInfo.mobileId, 
+            eventName:'mobileInResponse',
+            payload:{
+              visualType:visualType,
+              visualId:visualId,
+              payload:res.payload
+            }
+          });
           if(res.mobileInfo.screenIndex===self.screen.screenIndex){
             self.socket.emit('mobileMessage',{
               to:res.mobileInfo.mobileId, 

@@ -12,18 +12,21 @@
 
           var logger=$log.getInstance('MKSENSE-GRID');
           var random= new Math.seedrandom('mksenseGrid');
-          var arrIndexes=[];
-
-          function printIndexes(){
-            for(var i=0; i<3; i++){
-              var str='';
-              arrIndexes.forEach(function(index){
-                str+=index[i]+'\t'; 
-              }); 
-              console.log(str);
+          //scope.artObjects=scope.artObjects.slice(0,500);
+          scope.artObjects.sort(function(a,b){
+            if(a.cover && b.cover){
+              if(a.cover.dominant_color>b.cover.dominant_color){
+                return 1;
+              }else if(a.cover.dominant_color===b.cover.dominant_color){
+                return 0; 
+              }else{
+                return -1; 
+              }
+            }else{
+              return 0; 
             } 
-          }
-
+          });
+          var arrIndexes=[];
           var currentIndex=null;
 
           element.css('width',scope.screenInfo.width+"px");
@@ -41,7 +44,6 @@
           element.append(scope.renderer.domElement);
           scope.status="PENDING";
           scope.$emit("compileDone",scope.sequenceIndex);
-          scope.timerMap={};
 
           var mobileIn=scope.$on('mobileIn',function(event,mobileInfo){
             logger.debug('mobileIn',mobileInfo);
@@ -50,8 +52,12 @@
             var objects=indexes.map(function(index){
               return scope.artObjects[index]; 
             });
-            scope.css3dObjects[indexes[0]].mobileCount++
+            scope.css3dObjects[indexes[0]].mobileCount++;
             scope.css3dObjects[indexes[0]].element.addClass('scaler');
+            if(scope.css3dObjects[indexes[0]].video){
+              scope.css3dObjects[indexes[0]].video.load();
+              scope.css3dObjects[indexes[0]].video.play();
+            }
             scope.$emit('mobileInResponse',{mobileInfo:mobileInfo,payload:{objects:objects,indexes:indexes},cache:scope.css3dObjects[indexes[0]]});
             scope.$emit('publish',{type:'actionEntry',payload:objects[0]});
           });
@@ -79,12 +85,17 @@
                   lastObject.mobileCount--;
                 if(lastObject.mobileCount<1){
                   lastObject.element.removeClass('scaler');
+                  if(lastObject.video)
+                    lastObject.video.pause();
                 }
                 newObject.mobileCount++;
+                if(newObject.video){
+                  newObject.video.load();
+                  newObject.video.play();
+                }
                 newObject.element.addClass('scaler');
                 scope.$emit('mobileActionResponse',{mobileInfo:mobileActionInfo.mobileInfo,payload:{type:'left',objects:objects,indexes:indexes},cache:newObject});
                 arrIndexes.push(indexes);
-                printIndexes();
                 scope.$emit('publish',{type:'actionEntry',payload:objects[0]});
               }else if(event.type==='right'){
                 var newObject=scope.css3dObjects[event.index];
@@ -103,11 +114,16 @@
                   lastObject.mobileCount--;
                 if(lastObject.mobileCount<1){
                   lastObject.element.removeClass('scaler');
+                  if(lastObject.video)
+                    lastObject.video.pause();
                 }
                 newObject.mobileCount++;
                 newObject.element.addClass('scaler');
+                if(newObject.video){
+                  newObject.video.load();
+                  newObject.video.play();
+                }
                 arrIndexes.push(indexes);
-                printIndexes();
                 scope.$emit('mobileActionResponse',{mobileInfo:mobileActionInfo.mobileInfo,payload:{type:'right',objects:objects,indexes:indexes},cache:newObject});
                 scope.$emit('publish',{type:'actionEntry',payload:objects[1]});
               }else if(event.type==='up'){
@@ -125,10 +141,17 @@
                 }
                 if(lastObject.mobileCount>0)
                   lastObject.mobileCount--;
-                if(lastObject.mobileCount<1)
+                if(lastObject.mobileCount<1){
                   lastObject.element.removeClass('scaler');
+                  if(lastObject.video)
+                    lastObject.video.pause();
+                }
                 newObject.mobileCount++;
                 newObject.element.addClass('scaler');
+                if(newObject.video){
+                  newObject.video.load();
+                  newObject.video.play();
+                }
                 scope.$emit('mobileActionResponse',{mobileInfo:mobileActionInfo.mobileInfo,payload:{type:'up',objects:objects,indexes:indexes,previousIndex:event.index},cache:newObject});
                 scope.$emit('publish',{type:'actionEntry',payload:objects[0]});
               }else if(event.type==='down'){
@@ -146,57 +169,19 @@
                 }
                 if(lastObject.mobileCount>0)
                   lastObject.mobileCount--;
-                if(lastObject.mobileCount<1)
+                if(lastObject.mobileCount<1){
                   lastObject.element.removeClass('scaler');
+                  if(lastObject.video)
+                    lastObject.video.pause();
+                }
                 newObject.mobileCount++;
+                if(newObject.video){
+                  newObject.video.load();
+                  newObject.video.play();
+                }
                 newObject.element.addClass('scaler');
                 scope.$emit('mobileActionResponse',{mobileInfo:mobileActionInfo.mobileInfo,payload:{type:'down',objects:objects,indexes:indexes,previousIndex:event.index},cache:newObject});
                 scope.$emit('publish',{type:'actionEntry',payload:objects[0]});
-              }
-            }
-            return;
-            $log.debug('mobileAction',mobileActionInfo);
-            var index=mobileActionInfo.cache;
-            if(!_.isNumber(index)){
-              scope.$emit('mobileIn',mobileActionInfo);
-            }else{
-              var event=mobileActionInfo.payload;
-              if(event.type==='swipe'){
-                var newIndex=getNextIndex(index,event.data);
-                  keepSelectedtoCenterRow2(index,true);
-                  transform(TWEEN.Easing.Cubic.InOut);
-                var lastObject=scope.css3dObjects[index];
-                var newObject=scope.css3dObjects[newIndex];
-                if(lastObject.mobileCount>0)
-                  lastObject.mobileCount--;
-                if(lastObject.mobileCount<1)
-                  lastObject.element.removeClass('scaler');
-                newObject.mobileCount++;
-                newObject.element.addClass('scaler');
-                scope.$emit('mobileActionResponse',{mobileInfo:mobileActionInfo.mobileInfo,payload:scope.artObjects[newIndex],cache:newIndex});
-              }else if(event.type==='status'&&event.data==='showMoreInfo'){
-                var lastObject=scope.css3dObjects[index];
-                lastObject.element.addClass("more-info");
-              }else if(event.type==='status'&&event.data==='hideMoreInfo'){
-                var lastObject=scope.css3dObjects[index];
-                lastObject.element.removeClass("more-info");
-              }
-              else if(event.type==='status'&&event.data==='showTags'){
-                var lastObject=scope.css3dObjects[index];
-                lastObject.element.hasClass("tagging")=== true ? lastObject.element.removeClass("tagging"):lastObject.element.addClass("tagging");
-              }
-              else if(event.type==='status'&&event.data==='giveComment'){
-                var lastObject=scope.css3dObjects[index];
-                lastObject.element.removeClass('scaler');
-                //$timeout.cancel(scope.timerMap[mobileActionInfo.mobileId]);
-                //scope.timerMap[mobileActionInfo.mobileId]=$timeout(function(){
-                scope.zIndex++;
-                newObject.mobileCount++;
-                newObject.element.css('z-index',scope.zIndex);
-                newObject.element.addClass('scaler');
-                //},300);
-                scope.$emit('mobileActionResponse',{mobileInfo:mobileActionInfo.mobileInfo,payload:scope.artObjects[newIndex],cache:newIndex});
-                scope.$emit('publish',{type:'actionEntry',payload:scope.artObjects[newIndex]});
               }
             }
           });
@@ -269,7 +254,22 @@
 
           function groupByKey(){
             var dict={};
-            var artObjects=scope.artObjects;
+            //var artObjects=scope.artObjects;
+            //var group=1;
+            //var counter=0;
+            //artObjects.forEach(function(obj,index){
+              //var val="分组"+group;
+              //if(obj.cover){
+                //if(!dict[val])dict[val]=[];
+                //dict[val].push(index);
+                //counter++;
+              //} 
+              //if(counter>30){
+                //group++; 
+                //counter=0;
+              //}
+            //});
+            //return dict;
             var groupBy=scope.configs.groupBy;
             scope.artObjects.forEach(function(obj,index){
               var val=eval('obj.'+groupBy);
@@ -358,30 +358,35 @@
             for(var key in gridGroups){
               for(var col in gridGroups[key]){
                 gridGroups[key][col].forEach(function(objIndex,rowIndex){
-                  // var e=angular.element('<div class="element" style="z-index:1;"></div>');
                   var e=angular.element('<div class="element"></div>');
-
                   var _height=0;
                   var _width=0;
-
                   if(artObjects[objIndex].cover.width>=artObjects[objIndex].cover.height){
                     _width=configs.featuredWidth;
                     _height=_width/artObjects[objIndex].cover.width*artObjects[objIndex].cover.height; //Back more info dimension height
                   }else {
                     _height=configs.featuredHeight;
                     _width=_height/artObjects[objIndex].cover.height*artObjects[objIndex].cover.width; //Back more info dimension height
-
                   }
 
-                  // var c=angular.element('<div class="cover" style="background-color:rgba(255,255,255,0);background-image:url(\''+artObjects[objIndex].cover.url+'?imageView2/2/w/'+configs.originalGridWidth+'/h/'+configs.originalGridHeight+'\');width:'+_width+'px;height:'+_height+'px;"></div>');
                   var front=angular.element('<div class="front" style="transform: translate3d(-50%,-50%,0) rotateY( 0deg ) scale('+configs.scale+');background-color:rgba(255,255,255,0);background-image:url(\''+artObjects[objIndex].cover.url+'?imageView2/2/w/'+configs.scaledWidth+'/h/'+configs.scaledHeight+'\');width:'+_width+'px;height:'+_height+'px;"></div>');
 
-                  var titleSize=32;
-                  if(artObjects[objIndex].title.split(" ").length - 1>2){
-                    titleSize=23;
+                  var video=null;
+                  if(artObjects[objIndex].video && artObjects[objIndex].video.url){
+                    video=angular.element('<video style="background:black" class="video" width="'+_width+'" height="'+_height+'" poster="'+artObjects[objIndex].cover.url+'?imageView2/2/w/'+configs.scaledWidth+'/h/'+configs.scaledHeight+'" preload="none"><source src="'+artObjects[objIndex].video.url+'" preload="none" type="video/mp4"/></video>') 
+                    front.append(video);
                   }
+
+                  var titleSize=32;
+                  if(artObjects[objIndex].title){
+                    if(artObjects[objIndex].title.split(" ").length - 1>2){
+                      titleSize=23;
+                    }
+                  }
+
                   var back=angular.element('<div class="back" style="width:'+_width+'px;height:'+_height+'px;"><div class="more"><div class="tr"><div class="cell" style="padding-right= 30px;"><p class="title" style="font-size:'+titleSize+'px;">'+artObjects[objIndex].title+'</p><p class="details">'+'Date: '+artObjects[objIndex].dating.year+'</p><p class="details">'+ 'Medium: '+artObjects[objIndex].physicalMedium+'</p><p class="details">'+'Dimension: '+artObjects[objIndex].subTitle+'</p><p class="description">'+artObjects[objIndex].description+'</p></div><div class="cell" style="padding-left= 30px; verticalAlign=middle;"><div class="img" style="background-color:rgba(255,255,255,0);background-image:url(\''+artObjects[objIndex].cover.url+'?imageView2/2/w/'+configs.originalGridWidth+'/h/'+configs.originalGridHeight+'\');"></div></div></div></div></div>');
-                  //tagging
+
+                  //var back=angular.element('<div class="back" style="width:'+_width+'px;height:'+_height+'px;"><iframe style="border:none;" src="http://api.mksense.cn/artobject/'+artObjects[objIndex].id+'/moreinfo/w/'+_width+'/h/'+_height+'/f/12" width="'+_width+'" height="'+_height+'"></iframe></div>')
 
                   var tags=angular.element('<div class="tags"><div style="top:150px;left:300px">I am one</div><div style="top:500px;left:200px">I am tag two three four I am tag two three four</div></div>');
 
@@ -391,6 +396,9 @@
                   e.append(back);
                   var object=new CSS3DObject(e);
                   object.mobileCount=0;
+                  if(video){
+                    object.video=video[0]; 
+                  }
                   objects[objIndex]=object;
                   css3dScene.add(object);
                 });

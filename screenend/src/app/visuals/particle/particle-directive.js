@@ -34,51 +34,108 @@
           element.append(stats.domElement);
           var loader = new THREE.TextureLoader();
           loader.crossOrigin=true;
-          var objects,targets,animateId,materials,colDeltas,columns;
+          var objects,targets,animateId,materials,colDeltas,columns,columnsMobiles;
           populateObjects();
 
           scope.$emit("compileDone");
           scope.$on('mobileIn',function(event,mobileInfo){
-            logger.debug('mobileIn',mobileInfo);
-            var data=getMobileInColumnAndIndex(mobileInfo.screenIndex);
-            logger.debug('Get mobileIn data',data);
-            var index=data.index;
-            var columnIndex=data.columnIndex;
-            scope.$emit('mobileInResponse',{mobileInfo:mobileInfo,payload:artObjects[index],cache:columnIndex});
-            scope.$emit('publish',{type:'actionEntry',payload:artObjects[index]});
+            var columnIndex=getMobileInColumnIndex(mobileInfo.screenIndex);
+            columnsMobiles[columnIndex]++;
+            var indexes=get9Indexes(columnIndex);
+            var objs=indexes.map(function(index){
+              return scope.artObjects[index]; 
+            });
+            activeObject(columnIndex,indexes[0]);
+            scope.$emit('mobileInResponse',{mobileInfo:mobileInfo,payload:{objects:objs,indexes:indexes},cache:columnIndex});
+            scope.$emit('publish',{type:'actionEntry',payload:objs[indexes[0]]});
           });
           scope.$on('mobileAction',function(event,mobileActionInfo){
-            logger.debug('mobileActionInfo',mobileActionInfo); 
-            var mobileInfo=_.cloneDeep(mobileActionInfo.mobileInfo);
+            var event=mobileActionInfo.payload;
             var columnIndex=mobileActionInfo.cache;
-            var action=mobileActionInfo.payload;
-            switch(action.type){
-              case 'swipe': 
-                var data=getNextColumnAndIndex(columnIndex,action.data); 
-                var index=data.index;
-                columnIndex=data.columnIndex;
-                scope.$emit('mobileActionResponse',{mobileInfo:mobileInfo,payload:artObjects[index],cache:columnIndex});
-                break;
-              case 'status':
-                switch(action.data){
-                  case 'showMoreInfo': 
-                    showMoreInfo(columnIndex);
-                  break;
-                  case 'hideMoreInfo':
-                    hideMoreInfo(columnIndex);
-                  break;
-                }
+            if(columnIndex !== 0 && !columnIndex){
+              scope.$emit('mobileIn',mobileActionInfo.mobileInfo);
+            }else{
+              if(event.type==='left'){
+                columnsMobiles[columnIndex]--;
+                transformColumn(columnIndex);
+                columnIndex--;
+                if(columnIndex<0)columnIndex=columns.length-1;
+                columnsMobiles[columnIndex]++;
+                activeObject(columnIndex,event.index);
+                var nextColumn=columnIndex-1;
+                if(nextColumn<0)nextColumn=columns.length-1;
+                var indexes=get3Indexes(nextColumn);
+                var objs=indexes.map(function(index){
+                  return scope.artObjects[index]; 
+                });
+                scope.$emit('mobileActionResponse',{mobileInfo:mobileActionInfo.mobileInfo,payload:{type:'left',objects:objs,indexes:indexes},cache:columnIndex});
+                scope.$emit('publish',{type:'actionEntry',payload:objs[0]});
+              }else if(event.type==='right'){
+                columnsMobiles[columnIndex]--;
+                transformColumn(columnIndex);
+                columnIndex++;
+                if(columnIndex>=columns.length)columnIndex=0;
+                columnsMobiles[columnIndex]++;
+                activeObject(columnIndex,event.index);
+                var nextColumn=columnIndex+1;
+                if(nextColumn>=columns.length)nextColumn=0;
+                var indexes=get3Indexes(nextColumn);
+                var objs=indexes.map(function(index){
+                  return scope.artObjects[index]; 
+                });
+                scope.$emit('mobileActionResponse',{mobileInfo:mobileActionInfo.mobileInfo,payload:{type:'right',objects:objs,indexes:indexes},cache:columnIndex});
+                scope.$emit('publish',{type:'actionEntry',payload:objs[0]});
+              }else if(event.type==='up'){
+                activeObject(columnIndex,event.index);
+                var indexes=get3Indexes(columnIndex);
+                scope.$emit('mobileActionResponse',{mobileInfo:mobileActionInfo.mobileInfo,payload:{type:'up',objects:[scope.artObjects[indexes[0]]],indexes:[indexes[0]],previousIndex:event.index},cache:columnIndex});
+                scope.$emit('publish',{type:'actionEntry',payload:scope.artObjects[indexes[1]]});
+              }else if(event.type==='down'){
+                activeObject(columnIndex,event.index);
+                var indexes=get3Indexes(columnIndex);
+                scope.$emit('mobileActionResponse',{mobileInfo:mobileActionInfo.mobileInfo,payload:{type:'down',objects:[scope.artObjects[indexes[2]]],indexes:[indexes[2]],previousIndex:event.index},cache:columnIndex});
+                scope.$emit('publish',{type:'actionEntry',payload:scope.artObjects[indexes[1]]});
+              }
             }
           });
 
           function get9Indexes(columnIndex){
-
+            var indexes=[null,null,null,null,null,null,null,null,null];
+            var a=get3Indexes(columnIndex);
+            indexes[0]=a[1];
+            indexes[3]=a[0];
+            indexes[7]=a[2];
+            var indexB=columnIndex-1;
+            if(indexB<0)indexB=columns.length-1;
+            console.log(indexB);
+            var b=get3Indexes(indexB);
+            indexes[1]=b[0];
+            indexes[2]=b[1];
+            indexes[8]=b[2];
+            var indexC=columnIndex+1;
+            console.log(indexC);
+            if(indexC>=columns.length)indexC=0;
+            var c=get3Indexes(indexC);
+            indexes[5]=c[0];
+            indexes[4]=c[1];
+            indexes[6]=c[2];
+            return indexes;
           }
 
           function get3Indexes(columnIndex){
-            columns[columnIndex].forEach(function(index){
-            
-            }); 
+            var indexes=_.clone(columns[columnIndex]);
+            indexes.sort(function(a,b){
+              return Math.abs(targets[a].position.y)-Math.abs(targets[b].position.y);
+            });
+            if(indexes.length<1){
+              return [null,null,null];
+            }else if(indexes.length<2){
+              return [indexes[0],indexes[0],indexes[0]];
+            }else if(indexes.length<3){
+              return [indexes[1],indexes[0],indexes[1]];
+            }else{
+              return [indexes[1],indexes[0],indexes[indexes.length-1]];
+            }
           }
 
           function getMobileInColumnIndex(screenIndex){
@@ -93,13 +150,25 @@
               if(targets[index]){
                 return targets[index].columnIndex;
               }else{
-                return undefined;
+                return null;
               }
             }else{
-              return undefined;
+              return null;
             }
           }
 
+          function activeObject(columnIndex,index){
+            var delta=0-targets[index].position.y;
+            columns[columnIndex].forEach(function(objIndex){
+              var target=targets[objIndex]; 
+              target.position.y+=delta; 
+              if(target.position.y>Math.PI*2)
+                target.position.y-=Math.PI*2;
+              if(target.position.y<0)
+                target.position.y+=Math.PI*2;
+            });
+            transformColumn(columnIndex);
+          }
 
           function showMoreInfo(columnIndex){
             logger.debug('showMoreInfo',columnIndex);
@@ -194,6 +263,7 @@
           }
 
           scope.$emit("compileDone");
+
           scope.$on('fadeIn',function(event){
             scope.status="PLAY";
             element.css('opacity','1');
@@ -203,13 +273,13 @@
             transform(TWEEN.Easing.Cubic.InOut,2000);
             logger.debug('Catch fadeIn event');
           });
-          scope.$on('fadeOut',function(event,sequenceIndex){
+
+          scope.$on('fadeOut',function(event){
             element.css('opacity','0');
             $timeout(function(){
               cancelAnimationFrame(animateId);
-              $interval.cancel(intervalId);
               TWEEN.removeAll();
-              scope.$emit('fadeOutDone',scope.sequenceIndex);
+              scope.$emit('fadeOutDone');
             },3000);
           });
           scope.$on('$destroy',function(){
@@ -276,10 +346,7 @@
                   width=Math.floor(height/artObjects[objIndex].cover.height*artObjects[objIndex].cover.width);
                 }
                 var geometry = new THREE.BoxGeometry( width, height, 1 );
-                var faceMaterials=_.range(6).map(function(){
-                  return new THREE.MeshBasicMaterial({color:0xffffff}); 
-                });
-                var material=new THREE.MeshFaceMaterial(faceMaterials);
+                var material = new THREE.MeshBasicMaterial({transparent:true}); 
                 var sprite = new THREE.Mesh( geometry, material );
                 sprite.position.x = (Math.random() *2-1)*screenInfo.zoneWidth;
                 sprite.position.y = (Math.random() *2-1)*screenInfo.zoneHeight;
@@ -292,25 +359,20 @@
                 scene.add( sprite );
                 loader.load(artObjects[objIndex].cover.url+'?imageView2/2/w/'+configs.gridWidth*2+'/h/'+configs.gridHeight*2,function ( frontTexture ) {
                   frontTexture.minFilter=THREE.LinearFilter;
-                  material.materials[4]=new THREE.MeshBasicMaterial({map:frontTexture})
-                  //loader.crossOrigin=true;
-                  //loader.load(mkConfig.screenshotServer+'?force=true&width='+width+'&height='+height+'&url='+encodeURI(mkConfig.cmsServer+'artobject/'+artObjects[objIndex].id+'/moreinfo/w/'+width+'/h/'+height+'/f/12'),function( backTexture ) {
-                    //backTexture.minFilter=THREE.LinearFilter;
-                    //material.materials[4]=new THREE.MeshBasicMaterial({map:frontTexture})
-                    //material.materials[5]=new THREE.MeshBasicMaterial({map:backTexture})
-                  //});
+                  material.map=frontTexture;
                 });
               }); 
             }
           }
 
-          function transformColumn(columnIndex){
+          function transformColumn(columnIndex,duration){
+            var globalScale=columnsMobiles[columnIndex]>0?1:0.7;
             columns[columnIndex].forEach(function(objIndex){
               var target=targets[objIndex]; 
               var object=objects[objIndex];
               var material=materials[objIndex];
               if(!target || !object || !material)return;
-              var dt=500;
+              var dt=duration?duration:500;
               var targetX=target.position.x;
               var targetY=Math.sin(target.position.y)*radius;
               var targetZ=Math.cos(target.position.y)*radius;
@@ -328,15 +390,15 @@
               var scale=Math.abs(target.position.y-Math.PI)/Math.PI;
               if(scale<0.0001)scale=0.0001;
               new TWEEN.Tween( object.scale )
-              .to({x:Math.pow(scale,4),y:Math.pow(scale,4),z:1},dt)
+              .to({x:Math.pow(scale,4)*globalScale,y:Math.pow(scale,4)*globalScale,z:1},dt)
+              //.to({x:Math.pow(scale,4),y:Math.pow(scale,4),z:1},dt)
               .onUpdate(function(){
                 var value=(object.position.z+radius)/2/radius;
                 var opacity=Math.pow(value,100);
-                if(opacity<0.5)
-                  opacity=0.5;
-                material.materials.forEach(function(m){
-                  m.opacity=opacity;
-                });
+                if(opacity<0.7)
+                  opacity=0.7;
+                //material.opacity=opacity;
+                material.opacity=opacity*globalScale;
               })
               .easing(TWEEN.Easing.Cubic.In)
               .start();
@@ -348,60 +410,11 @@
           }
 
           function transform(easing,duration){
-            //TWEEN.removeAll();
-            for(var key in keyGroups){
-              if(keyGroups[key].length<configs.minimumRowCountInColumn)continue;
-              keyGroups[key].forEach(function(objIndex,rowIndex){
-                var target=targets[objIndex];
-                var object=objects[objIndex];
-                var material=materials[objIndex];
-                if(!target || !object || !material)return;
-                var dt=random() * duration+duration;
-                var targetX=target.position.x;
-                var targetY=Math.sin(target.position.y)*radius;
-                var targetZ=Math.cos(target.position.y)*radius;
-                var angle=target.position.y
-                if(Math.abs(angle)<0.001){
-                  object.position.z=radius*2; 
-                  targetZ=object.position.z;
-                }else if(object.position.z>radius){
-                  object.position.z=radius; 
-                }
-                new TWEEN.Tween( object.position )
-                .to( { x:targetX, y:targetY, z:targetZ },dt)
-                .easing(easing)
-                .start();
-                //if(Math.abs(angle)<0.0001){
-                  //$timeout(function(){
-                    //new TWEEN.Tween( object.rotation )
-                    //.to( { x:0, y: Math.PI, z:0 },2000)
-                    //.easing(TWEEN.Easing.Cubic.In)
-                    //.start();
-                    //$timeout(function(){
-                      //new TWEEN.Tween( object.rotation )
-                      //.to( { x:0, y: 0, z:0 },2000)
-                      //.easing(TWEEN.Easing.Cubic.In)
-                      //.start();
-                    //},3000);
-                  //},1000);
-                //}
-                var scale=Math.abs(target.position.y-Math.PI)/Math.PI;
-                if(scale<0.0001)scale=0.0001;
-                new TWEEN.Tween( object.scale )
-                .to({x:Math.pow(scale,4),y:Math.pow(scale,4),z:1},dt)
-                .onUpdate(function(){
-                  var value=(object.position.z+radius)/2/radius;
-                  var opacity=Math.pow(value,100);
-                  if(opacity<0.5)
-                    opacity=0.5;
-                  material.opacity=opacity;
-                })
-                .easing(easing)
-                .start();
-              });
-            }
+            TWEEN.removeAll();
+            columns.forEach(function(c,columnIndex){
+              transformColumn(columnIndex);
+            });
           }
-          //end transform
 
           function animate(){
             TWEEN.update();
@@ -410,12 +423,12 @@
             animateId=requestAnimationFrame(animate);
           }
 
-          //end populateObjects
           function populateTargets(){
             if(!targets)
               targets=artObjects.map(function(){return null});
             colDeltas=[];
             columns=[];
+            columnsMobiles=[];
             var columnIndex=0;
             for(var key in keyGroups){
               if(keyGroups[key].length<configs.minimumRowCountInColumn)continue;
@@ -431,6 +444,7 @@
                 target.columnIndex=columnIndex;
               });
               columns.push(indexes);
+              columnsMobiles.push(0);
               columnIndex++;
             }
             return

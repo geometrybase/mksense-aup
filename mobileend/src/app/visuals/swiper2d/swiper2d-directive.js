@@ -25,15 +25,14 @@
 
           swiper.on('slideNextEnd',function(){
             console.log('next current',swipers[swiper.activeIndex].activeIndex);
-            printSwiperIndexes();
-            scope.$emit('mobileAction',{type:'right',index:swipers[swiper.activeIndex].slides[swipers[swiper.activeIndex].activeIndex].index});
+            scope.$emit('mobileAction',{type:'left',index:swipers[swiper.activeIndex].slides[swipers[swiper.activeIndex].activeIndex].index});
             scope.$emit('swiper2dArtObject',swipers[swiper.activeIndex].slides[swipers[swiper.activeIndex].activeIndex].artObject);
           });
 
           swiper.on('slidePrevEnd',function(){
             console.log('pre current',swipers[swiper.activeIndex].activeIndex);
             printSwiperIndexes();
-            scope.$emit('mobileAction',{type:'left',index:swipers[swiper.activeIndex].slides[swipers[swiper.activeIndex].activeIndex].index});
+            scope.$emit('mobileAction',{type:'right',index:swipers[swiper.activeIndex].slides[swipers[swiper.activeIndex].activeIndex].index});
             scope.$emit('swiper2dArtObject',swipers[swiper.activeIndex].slides[swipers[swiper.activeIndex].activeIndex].artObject);
           });
 
@@ -42,8 +41,8 @@
             swiper.removeAllSlides();
             var objects=res.payload.objects;
             var indexes=res.payload.indexes;
-            var grids=[[indexes[2],indexes[1],indexes[8]],[indexes[3],indexes[0],indexes[7]],[indexes[4],indexes[5],indexes[6]]];
-            var objIndexes=[[2,1,8],[3,0,7],[4,5,6]];
+            var grids=[[indexes[6],indexes[5],indexes[4]],[indexes[7],indexes[0],indexes[3]],[indexes[8],indexes[1],indexes[2]]];
+            var objIndexes=[[6,5,4],[7,0,3],[8,1,2]];
             grids.forEach(function(g,index){
               swiper.appendSlide('<div class="swiper-slide"><div class="swiper-container swiper-container-v swiper-container-v-'+index+'"><div class="swiper-wrapper"></div></div></div>')
             })
@@ -95,21 +94,10 @@
           scope.$on('mobileActionResponse',function(event,res){
             var objects=res.payload.objects;
             var indexes=res.payload.indexes;
+            objects.reverse();
+            indexes.reverse();
             if(objects.length===3 && indexes.length===3){
-              if(res.payload.type==='right' && swiper.isEnd){
-                swipers[0].slides.each(function(index,s){
-                  s.index=indexes[index]; 
-                  s.artObject=objects[index];
-                  s.style.backgroundImage='url(\''+objects[index].cover.url+'?imageView2/2/w/640\')';
-                });
-                var slide=swiper.slides[0];
-                swiper.removeSlide(0);
-                swipers.push(swipers[0]);
-                swiper.appendSlide(slide)
-                swipers.shift();
-                printSwiperIndexes();
-              }
-              if(res.payload.type==='left' &&  swiper.isBeginning){
+              if(res.payload.type==='right' && swiper.isBeginning){
                 swipers[2].slides.each(function(index,s){
                   s.index=indexes[index]; 
                   s.artObject=objects[index];
@@ -122,11 +110,23 @@
                 swipers.pop();
                 printSwiperIndexes();
               }
+              if(res.payload.type==='left' &&  swiper.isEnd){
+                swipers[0].slides.each(function(index,s){
+                  s.index=indexes[index]; 
+                  s.artObject=objects[index];
+                  s.style.backgroundImage='url(\''+objects[index].cover.url+'?imageView2/2/w/640\')';
+                });
+                var slide=swiper.slides[0];
+                swiper.removeSlide(0);
+                swipers.push(swipers[0]);
+                swiper.appendSlide(slide)
+                swipers.shift();
+                printSwiperIndexes();
+              }
             }else if(objects.length===1 && indexes.length===1){
               var currentSwiper=swipers[swiper.activeIndex];
               var previousIndex=res.payload.previousIndex; 
               var currentIndex=currentSwiper.slides[currentSwiper.activeIndex].index;
-              console.log(previousIndex,currentIndex,res.payload.type,currentSwiper.isBeginning);
               if(res.payload.type==='up' && currentSwiper.isBeginning && previousIndex === currentIndex){
                 var s=currentSwiper.slides[2]; 
                 s.index=indexes[0];

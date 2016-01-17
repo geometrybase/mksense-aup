@@ -19,10 +19,10 @@
           element.css('cursor','none')
           element.css('border-bottom','solid red 1px');
 
-          scope.artObjects=scope.artObjects.slice(0,50);
+          scope.artObjects=scope.artObjects.slice(0,500);
 
-          var width = scope.screenInfo.width;
-          var height = scope.screenInfo.height;
+          var width = scope.screenInfo.zoneWidth;
+          var height = scope.screenInfo.zoneHeight;
 
           var xSteps=[];
           var widths=[];
@@ -38,7 +38,7 @@
 
           scope.artObjects.forEach(function(obj){
             if(obj && obj.cover){
-              totalLength+=obj.cover.width*scope.screenInfo.height/obj.cover.height+gap;
+              totalLength+=obj.cover.width*scope.screenInfo.zoneHeight/obj.cover.height+gap;
             }
           });
 
@@ -47,8 +47,8 @@
             if(obj && obj.cover){
                xSteps.push(lastX); 
                indexes.push(index);
-               widths.push(obj.cover.width*scope.screenInfo.height/obj.cover.height/totalLength*scope.screenInfo.width);
-               lastX+=(obj.cover.width*scope.screenInfo.height/obj.cover.height+gap)/totalLength*scope.screenInfo.width;
+               widths.push(obj.cover.width*scope.screenInfo.zoneHeight/obj.cover.height/totalLength*scope.screenInfo.zoneWidth);
+               lastX+=(obj.cover.width*scope.screenInfo.zoneHeight/obj.cover.height+gap)/totalLength*scope.screenInfo.zoneWidth;
             }
           });
           xSteps.push(lastX);
@@ -56,25 +56,30 @@
          var  ySteps = d3.range(10, height, 50);
 
 
-          var xFisheye = Fisheye.scale(d3.scale.identity,totalLength/scope.screenInfo.width+1).domain([0, width]).focus(width/2),
-          yFisheye = Fisheye.scale(d3.scale.identity).domain([0, height]).focus(90);
+          var xFisheye = Fisheye.scale(d3.scale.identity,totalLength/scope.screenInfo.zoneWidth+1).domain([0, scope.screenInfo.zoneWidth]).focus(scope.screenInfo.zoneWidth/2),
+          yFisheye = Fisheye.scale(d3.scale.identity).domain([0, scope.screenInfo.zoneHeight]).focus(90);
           
           var canvas = d3.select(element[0]).append('div')
           .style('width',width+'px')
           .style('height',Math.floor(height*0.7)+'px')
-          .style('padding-top',Math.floor(height*0.1)+'px');
+          .style('padding-top',Math.floor(height*0.1)+'px')
+          .style('position','absolute')
+          .style('top','0px')
+          .style('left',-scope.screenInfo.x+'px');
 
           var labelContainer=d3.select(element[0])
           .append('div')
           .style('width','100%')
           .style('height',Math.floor(height*0.2)+'px')
-          .style('position','relative');
+          .style('position','absolute')
+          .style('top',Math.floor(height*0.8)+'px')
+          .style('left',-scope.screenInfo.x+'px');
 
           var images = canvas.selectAll('.fisheye-image')
           .data(indexes)
           .enter().append('div')
           .attr('class','fisheye-image')
-          .style('height',Math.floor(scope.screenInfo.height*0.7)+'px')
+          .style('height',Math.floor(height*0.7)+'px')
           .style('left',function(d,index){
             return xFisheye(xSteps[index])+'px'; 
           })
@@ -87,7 +92,7 @@
             return 'url(\''+scope.artObjects[indexes[index]].cover.url+'?imageView2/2/h/'+scope.screenInfo.height+'\')'; 
           })
           .style('background-size',function(d,index){
-            if((xFisheye(xSteps[index+1])-xFisheye(xSteps[index]))/(scope.screenInfo.height*0.7)>scope.artObjects[indexes[index]].cover.width/scope.artObjects[indexes[index]].cover.height){
+            if((xFisheye(xSteps[index+1])-xFisheye(xSteps[index]))/(height*0.7)>scope.artObjects[indexes[index]].cover.width/scope.artObjects[indexes[index]].cover.height){
               return 'contain'; 
             }else{
               return 'cover'; 
@@ -150,7 +155,7 @@
             .duration(1000)
             .style('background-size',function(d,index){
               var width=xFisheye(xSteps[index+1])-xFisheye(xSteps[index]);
-              var height=scope.screenInfo.height*0.7;
+              var height=scope.screenInfo.zoneHeight*0.7;
               var coverWidth=scope.artObjects[indexes[index]].cover.width;
               var coverHeight=scope.artObjects[indexes[index]].cover.height;
               return Math.floor(height/coverHeight*coverWidth)+'px '+Math.floor(height)+'px';
