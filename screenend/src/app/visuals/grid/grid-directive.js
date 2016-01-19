@@ -101,6 +101,12 @@
                 if(event.data==='hideComments'){
                   hideComments(lastObject); 
                 }
+                if(event.data==='hideMoreinfo'){
+                  lastObject.element.removeClass('more-info');
+                }
+                if(event.data==='showMoreinfo'){
+                  lastObject.element.addClass('more-info');
+                }
               }
               if(event.type==='left'){
                 var newObject=scope.css3dObjects[event.index];
@@ -452,7 +458,17 @@
                       titleSize=23;
                     }
                   }
-                  var back=angular.element('<div class="back" style="width:'+imgWidth+'px;height:'+imgHeight+'px;"><div class="more"><div class="tr"><div class="cell" style="padding-right= 30px;"><p class="title" style="font-size:'+titleSize+'px;">'+artObjects[objIndex].title+'</p><p class="details">'+'Date: '+artObjects[objIndex].dating.year+'</p><p class="details">'+ 'Medium: '+artObjects[objIndex].physicalMedium+'</p><p class="details">'+'Dimension: '+artObjects[objIndex].subTitle+'</p><p class="description">'+artObjects[objIndex].description+'</p></div><div class="cell" style="padding-left= 30px; verticalAlign=middle;"><div class="img" style="background-color:rgba(255,255,255,0);background-image:url(\''+artObjects[objIndex].cover.url+'?imageView2/2/w/'+configs.originalGridWidth+'/h/'+configs.originalGridHeight+'\');"></div></div></div></div></div>');
+                  //var back=angular.element('<div class="back" style="width:'+imgWidth+'px;height:'+imgHeight+'px;box-sizing:border-box;padding:2em;"></div>');
+                  var back=angular.element('<div class="back" style="width:'+imgWidth+'px;height:'+imgHeight+'px;"></div>');
+                  var backMore=angular.element('<div class="more"></div>');
+                  var backText=angular.element('<div style="width:100%;height:100%;box-sizing:border-box;padding-bottom:14.25em"><div style="width:100%;height:100%;overflow-y:scroll;"><p class="title">'+artObjects[objIndex].title+'</p><p class="details">'+artObjects[objIndex].physicalMedium+'</p><p class="description">'+artObjects[objIndex].description+'</p></div></div>');
+                  var backComment=angular.element('<div style="width:100%;box-sizing:border-box;padding-right:2em;padding-bottom:1.25em;padding-left:4.8em;position:absolute;left:0em;bottom:10em;"><div style="box-sizing: border-box; padding-left:2em; padding-top:1.25em;width:4.8em;position:absolute;top:0;left:0;"><div style="background-image:url(\'http://img.name2012.com/uploads/allimg/2015-06/30-023131_451.jpg\')" class="circular"></div></div><div style="width:100%;height:100%;overflow:hidden;padding-top:1.25em;padding-left:1.25em"><div style="display:inline;" class="socialId">CHEN</div><div style="font-size:1em; font-family: \'dinLight\';display:inline; right:0px; float:right;padding-top:0.5em; padding-right:1.25em;">'+'12 November 1928'+'</div><div style="display:table-cell;width:80%;" class="comment">'+'COMMENT ME'+'</div></div>');
+                  var backBar=angular.element('<div style="height:8em;width:100%;position:absolute;right:0;bottom:2em;padding:0em 2em 0em 2em;box-sizing:border-box;"><div style="height:8em;display:table;margin:0 auto;background:white;"><div style="display:table-row;height:em;"><div style="display:table-cell;height:100%;"><img src="http://7xq46r.com1.z0.glb.clouddn.com/22963e4619653e62feb73c5722c4a62d09b73bc9.jpg?imageView2/2/w/300/h/300" style="height:8em;width:auto;"></div><div style="display:table-cell;vertical-align:middle;height:100%;width:7em;text-align:center;"><img src="http://assets.mksense.cn/hear.svg" style="width:2.5em;height:2.5em;padding-bottom:0.2em;"><p style="font-size:0.8em; font-family: \'din\';  color:#989898; width:100%; text-align: center;margin:0;padding:0; ">'+'82 likes'+'</p></div><div style="display:table-cell;vertical-align:middle;height:100%;width:7em;text-align:center;"><img src="http://assets.mksense.cn/comment.svg" style="width:2.5em;height:2.5em;padding-bottom:0.2em;"><p style=" font-size:0.8em; font-family: \'din\';  color:#989898; width:100%; text-align: center;margin:0;padding:0; ">'+'12 comments'+'</p></div><div style="display:table-cell;vertical-align:middle;height:100%;width:7em;text-align:center;"><img src="http://assets.mksense.cn/collect.svg" style="width:2.5em;height:2.5em;padding-bottom:0.2em;"><p style="font-size:0.8em; font-family: \'din\'; color:#989898; width:100%; text-align: center; margin:0;padding:0; ">'+'3 collects'+'</p></div></div></div></div>');
+
+                  backMore.append(backText);
+                  backMore.append(backComment);
+                  backMore.append(backBar);
+                  back.append(backMore);
                   //var back=angular.element('<div class="back" style="width:'+imgWidth+'px;height:'+imgHeight+'px;"><iframe style="border:none;" src="http://api.mksense.cn/artobject/'+artObjects[objIndex].id+'/moreinfo/w/'+imgWidth+'/h/'+imgHeight+'/f/12" width="'+imgWidth+'" height="'+imgHeight+'"></iframe></div>')
                   var tags=angular.element('<div class="tags"></div>');
                   artObjects[objIndex].comments.forEach(function(comment){
@@ -579,13 +595,13 @@
           function randomObjectsPosition(){
             scope.css3dObjects.forEach(function(obj){
               if(!obj)return;
-              var x=(random()*2-1)*scope.screenInfo.zoneWidth;
+              //var x=(random()*2-1)*scope.screenInfo.zoneWidth;
               var y=(random()*2-1)*scope.screenInfo.zoneHeight;
-              if(x>scope.screenInfo.zoneWidth/2)x+=scope.screenInfo.zoneWidth;
-              if(x<scope.screenInfo.zoneWidth/2)x-=scope.screenInfo.zoneWidth;
+              //if(x>scope.screenInfo.zoneWidth/2)x+=scope.screenInfo.zoneWidth;
+              //if(x<scope.screenInfo.zoneWidth/2)x-=scope.screenInfo.zoneWidth;
               if(y>scope.screenInfo.zoneHeight/2)y+=scope.screenInfo.zoneHeight;
               if(y<scope.screenInfo.zoneHeight/2)y-=scope.screenInfo.zoneHeight;
-              obj.position.x=x;
+              //obj.position.x=x;
               obj.position.y=y;
             });
           }
@@ -631,25 +647,6 @@
             return indexes;
           }
 
-          function getNextIndex(index,vec){
-            var minDist=Number.MAX_VALUE;
-            var dir=new THREE.Vector3(vec[0],vec[1],0);
-            dir.setLength(Math.sqrt(scope.configs.gridWidth*scope.configs.gridWidth+scope.configs.gridHeight*scope.configs.gridHeight)/2);
-            var center=dir.add(scope.css3dTargets[index].position);
-            var newIndex=index;
-            scope.css3dTargets.forEach(function(obj,i){
-              if(!obj || i=== index)return;
-              dir=new THREE.Vector3();
-              dir.subVectors(obj.position,center);
-              if(dir.length()<minDist){
-                minDist=dir.length();
-                newIndex=i;
-                if(minDist<0.0001)
-                  console.log('xxxxxxx index',newIndex);
-              }
-            });
-            return newIndex;
-          }
 
           function displayTags() {
             scope.css3dObjects[currentIndex].element.hasClass("tagging")=== true ?scope.css3dObjects[currentIndex].element.removeClass("tagging"):scope.css3dObjects[currentIndex].element.addClass("tagging");
@@ -688,6 +685,25 @@
             }else{
               return false; 
             }
+          }
+          function getNextIndex(index,vec){
+            var minDist=Number.MAX_VALUE;
+            var dir=new THREE.Vector3(vec[0],vec[1],0);
+            dir.setLength(Math.sqrt(scope.configs.gridWidth*scope.configs.gridWidth+scope.configs.gridHeight*scope.configs.gridHeight)/2);
+            var center=dir.add(scope.css3dTargets[index].position);
+            var newIndex=index;
+            scope.css3dTargets.forEach(function(obj,i){
+              if(!obj || i=== index)return;
+              dir=new THREE.Vector3();
+              dir.subVectors(obj.position,center);
+              if(dir.length()<minDist){
+                minDist=dir.length();
+                newIndex=i;
+                if(minDist<0.0001)
+                  console.log('xxxxxxx index',newIndex);
+              }
+            });
+            return newIndex;
           }
 
           function render(){
