@@ -1,21 +1,23 @@
 
 <div hm-pan="close()"  ng-style="{'width':'100%','height':'100%','background-color':rgba(0,0,0,0.7)}">
 
-<div id='profilepic'  ng-style="{'background':'url({{profileUrl}}) no-repeat','background-size':'cover','background-position':'center','background-color':'transparent','z-index':'5'}"></div>
+<div id='profilepic'  ng-style="{'background':'url({{profileUrl}}) no-repeat','background-size':'cover','background-position':'center','background-color':'transparent','z-index':'5','top':'25%'}">
 
-<div id='camera' ng-style="{'background':'url(visuals/swiper1d/icon/profile.svg) no-repeat','background-size':'100% 100%','background-position':'center','background-color':'transparent','top':'27%','left':'57%','position':'absolute','z-index':'5'}"></div>
+<div id='setting' ng-style="{'background':'url(visuals/swiper1d/icon/setting.svg) no-repeat','background-size':'100% 100%','background-position':'center','background-color':'transparent','z-index':'5','left':'50%','top':'25%'}"></div>
 
-<div id='setting' ng-style="{'background':'url(visuals/swiper1d/icon/setting.svg) no-repeat','background-size':'100% 100%','background-position':'center','background-color':'transparent','top':'20%','left':'75%','position':'absolute','z-index':'5'}"></div>
+<div id='camera' ng-style="{'background':'url(visuals/swiper1d/icon/profile.svg) no-repeat','background-size':'100% 100%','background-position':'center','background-color':'transparent','top':'67px','left':'67px','position':'absolute','z-index':'5'}"></div>
+</div>
 
  <div  class='art' ng-if='artObject' ng-style="{'background-image':'url(\''+artObject.cover.url+'?imageView2/2/w/320\')','z-index':0}">
   <div class='layer' ng-style="{'background-color':'rgba(0,0,0, 0.5)','position':'absolute','top':'0','left':'0','width':'100%','height':'100%','z-index':'5'}"></div>
-	<div id='about' ng-style="{'background':'url(visuals/swiper1d/icon/about.svg) no-repeat','background-color':'transparent','bottom':'10px','left':'5px','position':'absolute','z-index':'5'}"></div>
+	<div id='about' ng-style="{'background':'url(visuals/swiper1d/icon/about.svg) no-repeat','background-color':'transparent','bottom':'20px','left':'10px','position':'absolute','z-index':'5'}"></div>
 </div>
 
 <div id="downloadapp"> 
 <p id="info" style="color:black;margin:auto;text-align: center;">download app for better experience</p>
 <button id='logo' ng-style="{'background':'url(visuals/swiper1d/icon/logo.svg) no-repeat','background-color':'white','background-size':'100% 100%','background-position':'center','z-index':'5'}"></button>
-<p id="info" style="color:black;margin:auto;text-align: center;"> <br/><br/><br/>learn about make sense <br/><br/> tutorial <br/><br/> SWIPE TO CLOSE ></p>
+<p id="info" style="color:black;margin:auto;text-align: center; margin-top:50px">learn about make sense</p>
+<p id="info" style="color:black;margin:auto;text-align: center;margin-top:60px">SWIPE TO CLOSE ></p>
 </div>
 
 </div>
@@ -56,49 +58,54 @@ border-radius: 50px;
 }
 
 #info{
-width:100%;
 z-index: 5;
 width:300px;
 margin:auto;
+margin-top:50px;
 font-weight: normal;
-font-size:14px;
 font-family: 'din';
-text-align: center;
 position: relative;	
 }
 
 .art{
   width:100%;
-  height:70%;
-  top:-20%;
+  height:50%;
+  top:0%;
   position:absolute;
-  background-size: 100%;
+  background-size: cover;
   background-repeat:no-repeat;
 }
 
 #profilepic{
 border: 0;
-height:120px;
-width:120px;
-border-radius: 120px;
+height:100px;
+width:100px;
+border-radius: 100px;
 margin:auto;
+margin-top:-50px;
 position:relative;
-top:15%;
+background-position: center;
 }
 
 #camera{
 border: 0;
-height:50px;
-width:50px;
-border-radius: 40px;
+height:35px;
+width:35px;
+border-radius: 35px;
 }
 
 #setting{
 border: 0;
-height:50px;
-width:50px;
-border-radius: 50px;
+height:45px;
+width:45px;
+border-radius: 45px;
+position:relative;
+background-position: center;
+margin-top:-22.5px;
+margin-left:72.5px;
 }
+
+
 
 #about{
 border: 0;

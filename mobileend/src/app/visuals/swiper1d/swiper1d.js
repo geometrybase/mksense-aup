@@ -39,6 +39,8 @@
           'content@scene.swiper1d':{
             templateUrl:'/visuals/swiper1d/moreinfo.html',
             controller:'Swiper1dController'
+          },
+          'footer@scene.swiper2d':{
           }
         }
       })
@@ -58,7 +60,7 @@
         url:'/comment',
         views:{
           'content@scene.swiper1d':{
-            template:'<mksense-comment></mksense-comment>'
+            templateUrl:'/visuals/swiper1d/comment.html'
           },
          'footer@scene.swiper1d':{
           }

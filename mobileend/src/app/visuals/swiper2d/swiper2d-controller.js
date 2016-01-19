@@ -37,6 +37,7 @@
 
       var swiper2dArtObject=$scope.$on('artObject',function(event,artObject){
         $scope.artObject=artObject; 
+        $scope.artTitle=artObject.title; 
         $scope.url=$sce.trustAsResourceUrl('http://api.mksense.cn/artobject/'+artObject.id+'/details');
       });
 
@@ -70,17 +71,10 @@
         }
       };
 
-        /* $scope.comment=function(event){
-         //$scope.$emit('mobileComment',{text:this.text, position:$scope.pressPos}); 
-         $state.go('scene.swiper2d');//then(function(){$state.go('^')});
-         $scope.text=this.text; 
-       };*/
-
       $scope.instruction='true';
       $scope.hideInstruction=function(){
        $scope.instruction=!$scope.instruction;
       };
-
 
       $scope.close=function(){
         $state.go('scene.swiper2d');//.//then(function(){$state.go('^')});

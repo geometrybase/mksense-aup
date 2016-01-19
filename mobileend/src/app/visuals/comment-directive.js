@@ -17,16 +17,15 @@
       scope.ShowComment=false;
       scope.commentPoint=function(event){
         scope.label='说点儿什么吧！';
-        scope.pressPos=[event.pageX,event.pageY];
-        scope.$emit('notification',scope.pressPos); 
+        scope.pressPos=[event.offsetX/window.innerWidth,event.offsetY/window.innerHeight];
         scope.ShowComment=true;
-       //scope.$emit('mobileComment',{type:'array',data:scope.pressPos}); 
+        scope.$emit('mobileComment',{type:'array',data:scope.pressPos}); 
         scope.pressPosData=[event.offsetX,event.offsetY];
       };
 
       scope.comment=function(event){
          scope.$emit('mobileComment',{text:this.text, position:scope.pressPos}); 
-         $state.go('scene.swiper2d');//then(function(){$state.go('^')});
+         $state.go('^').then(function(){$state.go('^')});
          scope.text=this.text; 
         
        };

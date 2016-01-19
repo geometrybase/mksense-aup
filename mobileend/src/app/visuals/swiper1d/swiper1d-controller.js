@@ -3,9 +3,9 @@
 
   angular.module('mksense.visuals.swiper1d')
   .controller('Swiper1dController', [
-    '$scope','$log', '$state','$localStorage', 
+    '$scope','$log', '$state','$localStorage', '$sce',
     function(
-      $scope,$log,$state,$localStorage
+      $scope,$log,$state,$localStorage,$sce
     ){
       //alert(JSON.stringify($localStorage.credentials));
       var logger=$log.getInstance('SWIPER1D CONTROLLER');
@@ -36,8 +36,10 @@
       $scope.state=$state.current;
       logger.debug($scope.state);
 
-      var swiper1dArtObject=$scope.$on('swiper1dArtObject',function(event,artObject){
+      var swiper1dArtObject=$scope.$on('artObject',function(event,artObject){
         $scope.artObject=artObject; 
+        $scope.artTitle=artObject.title; 
+        $scope.url=$sce.trustAsResourceUrl('http://api.mksense.cn/artobject/'+artObject.id+'/details');
       });
 
       var stateChangeStart=$scope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams){   
@@ -75,12 +77,6 @@
        $scope.instruction=!$scope.instruction;
       };
 
-      $scope.comment=function(){
-        $scope.$emit('mobileComment',{text:this.text, position:$scope.pressPos}); 
-        $state.go('scene.swiper1d');//.//then(function(){$state.go('^')});
-        $scope.text=this.text; 
-      };
-
       $scope.close=function(){
         $state.go('scene.swiper1d');//.//then(function(){$state.go('^')});
       };
@@ -96,7 +92,6 @@
 
       $scope.$on('$destroy',function(){
         stateChangeStart();
-        swiper1dArtObject();
       });
 
     }]);

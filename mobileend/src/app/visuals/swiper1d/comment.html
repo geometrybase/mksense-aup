@@ -1,6 +1,6 @@
-
+ 
 <div ng-click="commentPoint($event)"> 
-
+<mksense-comment></mksense-comment>
 <h2 id='gradient' ng-style="{'margin':0,'font-size':'18px','color':'white',
 'width':'100%','position':'absolute','text-align':'center','padding':'20px','z-index':2}">长按留下您希望评论的地方</h2>
  
@@ -18,8 +18,7 @@
 <button  ng-show="ShowComment"  ng-model="pressPos" ng-style="{ 'background':'url(visuals/grid/icon/round.svg) no-repeat','border':'0px','left':pressPosData[0]-5+'px','top':pressPosData[1]-2 + 'px', 'width':'10px', 'height':'10px',position:'absolute','z-index':1}"></button>
  
 </div>
-
-
+ 
 <style>
  
 .art{
@@ -31,7 +30,7 @@
 }
 
 #gradient{
-background:-webkit-gradient(linear, 0 0, 0 bottom, from(grey), to(rgba(255,255,255, 0))); 
+background:-webkit-gradient(linear, 0 0, 0 bottom, from(grey), to(rgba(0,0,0, 0))); 
 }
 
 .box{
