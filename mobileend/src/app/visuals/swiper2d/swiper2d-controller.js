@@ -44,9 +44,18 @@
         logger.debug('state change to',toState.name);
         $scope.state=toState;
         if(fromState.name==='scene.swiper2d.moreinfo'){
-          $scope.$emit('action',{type:'status',data:'hidemoreinfo'});
+          $scope.$emit('mobileAction',{type:'status',data:'hideMoreinfo'});
+        }
+        if(toState.name==='scene.swiper2d.moreinfo'){
+          $scope.$emit('mobileAction',{type:'status',data:'showMoreinfo'});
         }
         if(fromState.name==='scene.swiper2d.comment'){
+          logger.info('hideComments');
+          $scope.$emit('mobileAction',{type:'status',data:'hideComments'});
+        }
+        if(toState.name==='scene.swiper2d.comment'){
+          logger.info('showComments');
+          $scope.$emit('mobileAction',{type:'status',data:'showComments'}); 
         }
       });
 

@@ -33,6 +33,7 @@
           element.css('height',scope.screenInfo.height+"px");
           element.css('display','none');
           element.css('transition','opacity 2s cubic-bezier(0.55, 0.06, 0.68, 0.19)');
+          //element.css('background','black');
           scope.configs=adaptConfigs();
           scope.keyGroups=groupByKey();
           scope.gridGroups=groupByGrid();
@@ -42,12 +43,25 @@
           scope.renderer=new CSS3DRenderer();
           scope.renderer.domElement.css('position','absolute');
           element.append(scope.renderer.domElement);
+          addLables();
           scope.status="PENDING";
           scope.$emit("compileDone",scope.sequenceIndex);
 
+          function addLables(){
+            var container=angular.element('<div class="labels" style="width:100%;height:10%;z-index:1000;position:absolute;bottom:'+Math.floor(scope.configs.gridHeight/2)+'px;"></div>'); 
+            var index=0;
+            for(var key in scope.keyGroups){
+              var col=scope.keyGroups[key]; 
+              var left=index*(scope.configs.columnGap+scope.configs.gridWidth)+Math.floor(scope.configs.columnGap/2);
+              container.append('<div style="left:'+left+'px;position:absolute;padding:2px 5px;background:yellow;">'+key+'</div>');  
+              index+=col.length
+            }
+            element.append(container);
+          }
+
           var mobileIn=scope.$on('mobileIn',function(event,mobileInfo){
             logger.debug('mobileIn',mobileInfo);
-            var index=getCenterIndex();
+            var index=getCenterIndex(mobileInfo.screenIndex);
             var indexes=get9Indexes(index);
             var objects=indexes.map(function(index){
               return scope.artObjects[index]; 
@@ -57,10 +71,21 @@
             if(scope.css3dObjects[indexes[0]].video){
               scope.css3dObjects[indexes[0]].video.load();
               scope.css3dObjects[indexes[0]].video.play();
+              if(inCurrentScreen(indexes[0])){
+                scope.css3dObjects[indexes[0]].video.volume=1;
+              }else{
+                scope.css3dObjects[indexes[0]].video.volume=0;
+              }
             }
             scope.$emit('mobileInResponse',{mobileInfo:mobileInfo,payload:{objects:objects,indexes:indexes},cache:scope.css3dObjects[indexes[0]]});
             scope.$emit('publish',{type:'actionEntry',payload:objects[0]});
           });
+
+          function hideComments(css3dObject){
+            css3dObject.hideComments=$timeout(function(){
+              css3dObject.element.removeClass('tagging');
+            },3000);
+          }
 
           scope.$on('mobileAction',function(e,mobileActionInfo){
             var event=mobileActionInfo.payload;
@@ -68,13 +93,22 @@
             if(!lastObject){
               scope.$emit('mobileIn',mobileActionInfo.mobileInfo);
             }else{
+              if(event.type==='status'){
+                if(event.data==='showComments'){
+                  $timeout.cancel(lastObject.hideComments);
+                  lastObject.element.addClass('tagging');
+                }
+                if(event.data==='hideComments'){
+                  hideComments(lastObject); 
+                }
+              }
               if(event.type==='left'){
                 var newObject=scope.css3dObjects[event.index];
                 if(newObject.position.y>lastObject.position.y){
-                  keepSelectedtoCenterRow2(event.index,true);
+                  centerActive(event.index,true);
                   transform(TWEEN.Easing.Cubic.InOut);
                 }else if(newObject.position.y<lastObject.position.y){
-                  keepSelectedtoCenterRow2(event.index,false);
+                  centerActive(event.index,false);
                   transform(TWEEN.Easing.Cubic.InOut);
                 }
                 var indexes=get3Indexes(event.index,[-1,0,0]); 
@@ -85,13 +119,19 @@
                   lastObject.mobileCount--;
                 if(lastObject.mobileCount<1){
                   lastObject.element.removeClass('scaler');
-                  if(lastObject.video)
+                  if(lastObject.video){
                     lastObject.video.pause();
+                  }
                 }
                 newObject.mobileCount++;
                 if(newObject.video){
                   newObject.video.load();
                   newObject.video.play();
+                  if(inCurrentScreen(event.index)){
+                    newObject.video.volume=1;
+                  }else{
+                    newObject.video.volume=0;
+                  }
                 }
                 newObject.element.addClass('scaler');
                 scope.$emit('mobileActionResponse',{mobileInfo:mobileActionInfo.mobileInfo,payload:{type:'left',objects:objects,indexes:indexes},cache:newObject});
@@ -100,10 +140,10 @@
               }else if(event.type==='right'){
                 var newObject=scope.css3dObjects[event.index];
                 if(newObject.position.y>lastObject.position.y){
-                  keepSelectedtoCenterRow2(event.index,true);
+                  centerActive(event.index,true);
                   transform(TWEEN.Easing.Cubic.InOut);
                 }else if(newObject.position.y<lastObject.position.y){
-                  keepSelectedtoCenterRow2(event.index,false);
+                  centerActive(event.index,false);
                   transform(TWEEN.Easing.Cubic.InOut);
                 }
                 var indexes=get3Indexes(event.index,[1,0,0]); 
@@ -114,70 +154,88 @@
                   lastObject.mobileCount--;
                 if(lastObject.mobileCount<1){
                   lastObject.element.removeClass('scaler');
-                  if(lastObject.video)
+                  if(lastObject.video){
                     lastObject.video.pause();
+                  }
                 }
                 newObject.mobileCount++;
                 newObject.element.addClass('scaler');
                 if(newObject.video){
                   newObject.video.load();
                   newObject.video.play();
+                  if(inCurrentScreen(event.index)){
+                    newObject.video.volume=1;
+                  }else{
+                    newObject.video.volume=0;
+                  }
                 }
                 arrIndexes.push(indexes);
                 scope.$emit('mobileActionResponse',{mobileInfo:mobileActionInfo.mobileInfo,payload:{type:'right',objects:objects,indexes:indexes},cache:newObject});
                 scope.$emit('publish',{type:'actionEntry',payload:objects[1]});
               }else if(event.type==='up'){
-                var indexes=[getNextIndex(event.index,[0,1,0])]; 
-                var objects=indexes.map(function(index){
-                  return scope.artObjects[index];
-                });
-                var newObject=scope.css3dObjects[event.index];
-                if(newObject.position.y>lastObject.position.y){
-                  keepSelectedtoCenterRow2(event.index,true);
-                  transform(TWEEN.Easing.Cubic.InOut);
-                }else if(newObject.position.y<lastObject.position.y){
-                  keepSelectedtoCenterRow2(event.index,false);
-                  transform(TWEEN.Easing.Cubic.InOut);
-                }
-                if(lastObject.mobileCount>0)
-                  lastObject.mobileCount--;
-                if(lastObject.mobileCount<1){
-                  lastObject.element.removeClass('scaler');
-                  if(lastObject.video)
-                    lastObject.video.pause();
-                }
-                newObject.mobileCount++;
-                newObject.element.addClass('scaler');
-                if(newObject.video){
-                  newObject.video.load();
-                  newObject.video.play();
-                }
-                scope.$emit('mobileActionResponse',{mobileInfo:mobileActionInfo.mobileInfo,payload:{type:'up',objects:objects,indexes:indexes,previousIndex:event.index},cache:newObject});
-                scope.$emit('publish',{type:'actionEntry',payload:objects[0]});
-              }else if(event.type==='down'){
                 var indexes=[getNextIndex(event.index,[0,-1,0])]; 
                 var objects=indexes.map(function(index){
                   return scope.artObjects[index];
                 });
                 var newObject=scope.css3dObjects[event.index];
                 if(newObject.position.y>lastObject.position.y){
-                  keepSelectedtoCenterRow2(event.index,true);
+                  centerActive(event.index,true);
                   transform(TWEEN.Easing.Cubic.InOut);
                 }else if(newObject.position.y<lastObject.position.y){
-                  keepSelectedtoCenterRow2(event.index,false);
+                  centerActive(event.index,false);
                   transform(TWEEN.Easing.Cubic.InOut);
                 }
                 if(lastObject.mobileCount>0)
                   lastObject.mobileCount--;
                 if(lastObject.mobileCount<1){
                   lastObject.element.removeClass('scaler');
-                  if(lastObject.video)
+                  if(lastObject.video){
                     lastObject.video.pause();
+                  }
+                }
+                newObject.mobileCount++;
+                newObject.element.addClass('scaler');
+                if(newObject.video){
+                  newObject.video.load();
+                  newObject.video.play();
+                  if(inCurrentScreen(event.index)){
+                    newObject.video.volume=1;
+                  }else{
+                    newObject.video.volume=0;
+                  }
+                }
+                scope.$emit('mobileActionResponse',{mobileInfo:mobileActionInfo.mobileInfo,payload:{type:'up',objects:objects,indexes:indexes,previousIndex:event.index},cache:newObject});
+                scope.$emit('publish',{type:'actionEntry',payload:objects[0]});
+              }else if(event.type==='down'){
+                var indexes=[getNextIndex(event.index,[0,1,0])]; 
+                var objects=indexes.map(function(index){
+                  return scope.artObjects[index];
+                });
+                var newObject=scope.css3dObjects[event.index];
+                if(newObject.position.y>lastObject.position.y){
+                  centerActive(event.index,true);
+                  transform(TWEEN.Easing.Cubic.InOut);
+                }else if(newObject.position.y<lastObject.position.y){
+                  centerActive(event.index,false);
+                  transform(TWEEN.Easing.Cubic.InOut);
+                }
+                if(lastObject.mobileCount>0)
+                  lastObject.mobileCount--;
+                if(lastObject.mobileCount<1){
+                  lastObject.element.removeClass('scaler');
+                  if(lastObject.video){
+                    lastObject.video.pause();
+                  }
                 }
                 newObject.mobileCount++;
                 if(newObject.video){
                   newObject.video.load();
                   newObject.video.play();
+                  if(inCurrentScreen(event.index)){
+                    newObject.video.volume=1;
+                  }else{
+                    newObject.video.volume=0;
+                  }
                 }
                 newObject.element.addClass('scaler');
                 scope.$emit('mobileActionResponse',{mobileInfo:mobileActionInfo.mobileInfo,payload:{type:'down',objects:objects,indexes:indexes,previousIndex:event.index},cache:newObject});
@@ -185,6 +243,7 @@
               }
             }
           });
+
 
           scope.$on('mobileOut',function(event,mobileOutInfo){
             logger.debug('mobileOut',mobileOutInfo);
@@ -247,7 +306,7 @@
             cfg.scale=scope.configs.gridWidth/scope.configs.featuredWidth;
             cfg.scaledWidth=Math.floor(cfg.gridWidth/cfg.scale);
             cfg.scaledHeight=Math.floor(cfg.gridHeight/cfg.scale);
-
+            cfg.centerY=Math.floor(Math.floor(cfg.rowCount/2+0.5)*(cfg.gridHeight+cfg.rowGap)+0.5*cfg.rowGap);
             logger.debug('Adapt configs',cfg);
             return cfg;
           }
@@ -354,58 +413,73 @@
                 objects.push(null);
               });
             }
+            var columns=[]
             var columnIndex=0;
             for(var key in gridGroups){
               for(var col in gridGroups[key]){
+                var column=[];
                 gridGroups[key][col].forEach(function(objIndex,rowIndex){
+                  column.push(objIndex); 
                   var e=angular.element('<div class="element"></div>');
-                  var _height=0;
-                  var _width=0;
-                  if(artObjects[objIndex].cover.width>=artObjects[objIndex].cover.height){
-                    _width=configs.featuredWidth;
-                    _height=_width/artObjects[objIndex].cover.width*artObjects[objIndex].cover.height; //Back more info dimension height
-                  }else {
-                    _height=configs.featuredHeight;
-                    _width=_height/artObjects[objIndex].cover.height*artObjects[objIndex].cover.width; //Back more info dimension height
+                  var imgHeight=0;
+                  var imgWidth=0;
+                  if(artObjects[objIndex].video){
+                    if(artObjects[objIndex].video.width>=artObjects[objIndex].video.height){
+                      imgWidth=configs.featuredWidth;
+                      imgHeight=imgWidth/artObjects[objIndex].video.width*artObjects[objIndex].video.height; //Back more info dimension height
+                    }else {
+                      imgHeight=configs.featuredHeight;
+                      imgWidth=imgHeight/artObjects[objIndex].video.height*artObjects[objIndex].video.width; //Back more info dimension height
+                    }
+                  }else{
+                    if(artObjects[objIndex].cover.width>=artObjects[objIndex].cover.height){
+                      imgWidth=configs.featuredWidth;
+                      imgHeight=imgWidth/artObjects[objIndex].cover.width*artObjects[objIndex].cover.height; //Back more info dimension height
+                    }else {
+                      imgHeight=configs.featuredHeight;
+                      imgWidth=imgHeight/artObjects[objIndex].cover.height*artObjects[objIndex].cover.width; //Back more info dimension height
+                    }
                   }
-
-                  var front=angular.element('<div class="front" style="transform: translate3d(-50%,-50%,0) rotateY( 0deg ) scale('+configs.scale+');background-color:rgba(255,255,255,0);background-image:url(\''+artObjects[objIndex].cover.url+'?imageView2/2/w/'+configs.scaledWidth+'/h/'+configs.scaledHeight+'\');width:'+_width+'px;height:'+_height+'px;"></div>');
-
+                  var front=angular.element('<div class="front" style="transform: translate3d(-50%,-50%,0) rotateY( 0deg ) scale('+configs.scale+');background-color:rgba(255,255,255,0);background-image:url(\''+artObjects[objIndex].cover.url+'?imageView2/2/w/'+configs.scaledWidth+'/h/'+configs.scaledHeight+'\');width:'+imgWidth+'px;height:'+imgHeight+'px;"></div>');
                   var video=null;
                   if(artObjects[objIndex].video && artObjects[objIndex].video.url){
-                    video=angular.element('<video style="background:black" class="video" width="'+_width+'" height="'+_height+'" poster="'+artObjects[objIndex].cover.url+'?imageView2/2/w/'+configs.scaledWidth+'/h/'+configs.scaledHeight+'" preload="none"><source src="'+artObjects[objIndex].video.url+'" preload="none" type="video/mp4"/></video>') 
+                    video=angular.element('<video loop style="background:black" class="video" width="'+imgWidth+'" height="'+imgHeight+'" poster="'+artObjects[objIndex].cover.url+'?imageView2/2/w/'+configs.scaledWidth+'/h/'+configs.scaledHeight+'" preload="none"><source src="'+artObjects[objIndex].video.url+'" preload="none" type="video/mp4"/></video>') 
                     front.append(video);
                   }
-
                   var titleSize=32;
                   if(artObjects[objIndex].title){
                     if(artObjects[objIndex].title.split(" ").length - 1>2){
                       titleSize=23;
                     }
                   }
-
-                  var back=angular.element('<div class="back" style="width:'+_width+'px;height:'+_height+'px;"><div class="more"><div class="tr"><div class="cell" style="padding-right= 30px;"><p class="title" style="font-size:'+titleSize+'px;">'+artObjects[objIndex].title+'</p><p class="details">'+'Date: '+artObjects[objIndex].dating.year+'</p><p class="details">'+ 'Medium: '+artObjects[objIndex].physicalMedium+'</p><p class="details">'+'Dimension: '+artObjects[objIndex].subTitle+'</p><p class="description">'+artObjects[objIndex].description+'</p></div><div class="cell" style="padding-left= 30px; verticalAlign=middle;"><div class="img" style="background-color:rgba(255,255,255,0);background-image:url(\''+artObjects[objIndex].cover.url+'?imageView2/2/w/'+configs.originalGridWidth+'/h/'+configs.originalGridHeight+'\');"></div></div></div></div></div>');
-
-                  //var back=angular.element('<div class="back" style="width:'+_width+'px;height:'+_height+'px;"><iframe style="border:none;" src="http://api.mksense.cn/artobject/'+artObjects[objIndex].id+'/moreinfo/w/'+_width+'/h/'+_height+'/f/12" width="'+_width+'" height="'+_height+'"></iframe></div>')
-
-                  var tags=angular.element('<div class="tags"><div style="top:150px;left:300px">I am one</div><div style="top:500px;left:200px">I am tag two three four I am tag two three four</div></div>');
-
+                  var back=angular.element('<div class="back" style="width:'+imgWidth+'px;height:'+imgHeight+'px;"><div class="more"><div class="tr"><div class="cell" style="padding-right= 30px;"><p class="title" style="font-size:'+titleSize+'px;">'+artObjects[objIndex].title+'</p><p class="details">'+'Date: '+artObjects[objIndex].dating.year+'</p><p class="details">'+ 'Medium: '+artObjects[objIndex].physicalMedium+'</p><p class="details">'+'Dimension: '+artObjects[objIndex].subTitle+'</p><p class="description">'+artObjects[objIndex].description+'</p></div><div class="cell" style="padding-left= 30px; verticalAlign=middle;"><div class="img" style="background-color:rgba(255,255,255,0);background-image:url(\''+artObjects[objIndex].cover.url+'?imageView2/2/w/'+configs.originalGridWidth+'/h/'+configs.originalGridHeight+'\');"></div></div></div></div></div>');
+                  //var back=angular.element('<div class="back" style="width:'+imgWidth+'px;height:'+imgHeight+'px;"><iframe style="border:none;" src="http://api.mksense.cn/artobject/'+artObjects[objIndex].id+'/moreinfo/w/'+imgWidth+'/h/'+imgHeight+'/f/12" width="'+imgWidth+'" height="'+imgHeight+'"></iframe></div>')
+                  var tags=angular.element('<div class="tags"></div>');
+                  artObjects[objIndex].comments.forEach(function(comment){
+                    if(!comment.position)return;
+                    var top=Math.floor(comment.position[1]*100)+'%';
+                    var left=Math.floor(comment.position[0]*100)+'%';
+                    tags.append('<div style="top:'+top+';left:'+left+';">'+comment.text+'</div>'); 
+                  });
                   front.append(tags);
                   // e.append(c);
                   e.append(front);
                   e.append(back);
                   var object=new CSS3DObject(e);
                   object.mobileCount=0;
+                  object.columnIndex=columnIndex;
                   if(video){
                     object.video=video[0]; 
                   }
                   objects[objIndex]=object;
                   css3dScene.add(object);
                 });
+                columns.push(column);
                 columnIndex++;
               }
             }
             scope.css3dObjects=objects;
+            scope.columns=columns;
           }
 
           function populateTargets(){
@@ -421,7 +495,9 @@
               });
             }
             var columnIndex=0;
+            var labels=[]
             for(var key in gridGroups){
+              labels.push({key:key,columnIndex:columnIndex});
               for(var col in gridGroups[key]){
                 gridGroups[key][col].forEach(function(objIndex,rowIndex){
                   var target = new THREE.Object3D();
@@ -437,9 +513,37 @@
               }
             }
             scope.css3dTargets=targets;
+            scope.labels=labels;
           };
 
-          function keepSelectedtoCenterRow2(index,upDown){
+          function centerActive(index,upDown){
+
+            var object=scope.css3dObjects[index];
+            var target=scope.css3dTargets[index];
+            var column=scope.columns[object.columnIndex];
+            var delta=scope.configs.centerY-target.position.y;
+            column.forEach(function(objIndex){
+              scope.css3dTargets[objIndex].position.y+=delta;
+            });
+
+            var oneGrid=scope.configs.gridHeight+scope.configs.rowGap;
+            while(scope.css3dTargets[column[0]].position.y<-oneGrid){
+              var o=column.shift()
+              scope.css3dTargets[o].position.y=scope.css3dTargets[column[column.length-1]].position.y+oneGrid;
+              scope.css3dObjects[o].position.y=scope.screenInfo.zoneHeight+oneGrid;
+              column.push(o);
+            }
+
+            while(scope.css3dTargets[column[0]].position.y>0){
+              var o=column.pop();
+              scope.css3dTargets[o].position.y=scope.css3dTargets[column[0]].position.y-oneGrid;
+              scope.css3dObjects[o].position.y=-oneGrid/2;
+              column.unshift(o);
+            }
+
+            return;
+
+
             var indexes=[];
             var configs=scope.configs;
             var move;
@@ -448,7 +552,6 @@
             }else if(upDown==false) {
               move=configs.gridHeight+configs.rowGap;
             }
-
             scope.css3dTargets.forEach(function(TarObj,i){
               if(!TarObj)return;
               if(TarObj.position.x==scope.css3dTargets[index].position.x)
@@ -487,10 +590,12 @@
             });
           }
 
-          function getCenterIndex(){
+          function getCenterIndex(screenIndex){
+            console.log(screenIndex);
+            console.log(scope.screenInfos[screenIndex])
             var minDist=Number.MAX_VALUE;
             var minIndex=-1;
-            var screenCenter=new THREE.Vector3(scope.screenInfo.width/2+scope.screenInfo.x,scope.screenInfo.height/2+scope.screenInfo.y,0)
+            var screenCenter=new THREE.Vector3(scope.screenInfos[screenIndex].width/2+scope.screenInfos[screenIndex].x,scope.screenInfos[screenIndex].height/2+scope.screenInfos[screenIndex].y,0)
             scope.css3dTargets.forEach(function(obj,index){
               if(!obj)return;
               var dir=new THREE.Vector3();
@@ -546,7 +651,7 @@
             return newIndex;
           }
 
-          function displayTag() {
+          function displayTags() {
             scope.css3dObjects[currentIndex].element.hasClass("tagging")=== true ?scope.css3dObjects[currentIndex].element.removeClass("tagging"):scope.css3dObjects[currentIndex].element.addClass("tagging");
           }
 
@@ -574,6 +679,15 @@
             .to( {}, duration*2 )
             .onUpdate(render)
             .start();
+          }
+
+          function inCurrentScreen(index){
+            var target=scope.css3dTargets[index]; 
+            if(target.position.x>scope.screenInfo.x && target.position.x<scope.screenInfo.x+scope.screenInfo.width && target.position.y>scope.screenInfo.y && target.position.y<scope.screenInfo.y+scope.screenInfo.height){
+              return true; 
+            }else{
+              return false; 
+            }
           }
 
           function render(){

@@ -22,6 +22,8 @@
       // Add interceptors for $httpProvider and $sailsSocketProvider
       $httpProvider.interceptors.push('AuthInterceptor');
       $httpProvider.interceptors.push('ErrorInterceptor');
+      $httpProvider.defaults.cache = true;
+
 
       $stateProvider.state('mksense',{
         abstract:true,

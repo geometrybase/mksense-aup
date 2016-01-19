@@ -6,7 +6,7 @@ var mkConfig={
   },
   assetsUrl:'http://assets.mksense.cn/',
   cmsServer:'http://api.mksense.cn/',
-  mobileUrl:'http://33.mksense.cn:30001/#/',
+  mobileUrl:'http://99.mksense.cn:30001/#/',
   screenshotServer:'http://182.92.231.31:8891/',
   gulp:{
     port:40000

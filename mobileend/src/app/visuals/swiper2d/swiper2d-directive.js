@@ -1,5 +1,7 @@
 (function(){
+
   'use strict';
+
   angular.module('mksense.visuals.swiper2d')
   .directive('mksenseSwiper2d', [
     '$log','$timeout','$window','Swiper','$state',
@@ -42,8 +44,8 @@
             swiper.removeAllSlides();
             var objects=res.payload.objects;
             var indexes=res.payload.indexes;
-            var grids=[[indexes[6],indexes[5],indexes[4]],[indexes[7],indexes[0],indexes[3]],[indexes[8],indexes[1],indexes[2]]];
-            var objIndexes=[[6,5,4],[7,0,3],[8,1,2]];
+            var grids=[[indexes[2],indexes[1],indexes[8]],[indexes[3],indexes[0],indexes[7]],[indexes[4],indexes[5],indexes[6]]];
+            var objIndexes=[[2,1,8],[3,0,7],[4,5,6]];
             grids.forEach(function(g,index){
               swiper.appendSlide('<div class="swiper-slide"><div class="swiper-container swiper-container-v swiper-container-v-'+index+'"><div class="swiper-wrapper"></div></div></div>')
             })
@@ -95,23 +97,8 @@
           scope.$on('mobileActionResponse',function(event,res){
             var objects=res.payload.objects;
             var indexes=res.payload.indexes;
-            objects.reverse();
-            indexes.reverse();
             if(objects.length===3 && indexes.length===3){
-              if(res.payload.type==='right' && swiper.isBeginning){
-                swipers[2].slides.each(function(index,s){
-                  s.index=indexes[index]; 
-                  s.artObject=objects[index];
-                  s.style.backgroundImage='url(\''+objects[index].cover.url+'?imageView2/2/w/640\')';
-                });
-                var slide=swiper.slides[2];
-                swiper.removeSlide(2);
-                swipers.unshift(swipers[2]);
-                swiper.prependSlide(slide)
-                swipers.pop();
-                printSwiperIndexes();
-              }
-              if(res.payload.type==='left' &&  swiper.isEnd){
+              if(res.payload.type==='right' && swiper.isEnd){
                 swipers[0].slides.each(function(index,s){
                   s.index=indexes[index]; 
                   s.artObject=objects[index];
@@ -122,6 +109,20 @@
                 swipers.push(swipers[0]);
                 swiper.appendSlide(slide)
                 swipers.shift();
+                printSwiperIndexes();
+                console.log("right");
+              }
+              if(res.payload.type==='left' &&  swiper.isBeginning){
+                swipers[2].slides.each(function(index,s){
+                  s.index=indexes[index]; 
+                  s.artObject=objects[index];
+                  s.style.backgroundImage='url(\''+objects[index].cover.url+'?imageView2/2/w/640\')';
+                });
+                var slide=swiper.slides[2];
+                swiper.removeSlide(2);
+                swipers.unshift(swipers[2]);
+                swiper.prependSlide(slide)
+                swipers.pop();
                 printSwiperIndexes();
               }
             }else if(objects.length===1 && indexes.length===1){
@@ -136,7 +137,7 @@
                 currentSwiper.removeSlide(2);
                 currentSwiper.prependSlide(s);
               }
-              if(res.payload.type==='down' && currentSwiper.isEnd && previousIndex === currentIndex){
+              if(res.payload.type==='down' && currentSwiper.isBeginning && previousIndex === currentIndex){
                 var s=currentSwiper.slides[0]; 
                 s.index=indexes[0];
                 s.artObject=objects[0];
