@@ -19,8 +19,10 @@
             spaceBetween:20,
             paginationClickable: true
           });
-          if(scope.mobileInResponse)
+          if(scope.mobileInResponse){
+            logger.info('mobile in before');
             mobileInResponse(scope.mobileInResponse);
+          }
 
           swiper.on('slideNextEnd',function(){
             scope.$emit('mobileAction',{type:'next',index:swiper.slides[swiper.activeIndex].index});

@@ -2,9 +2,9 @@
   'use strict';
   angular.module('mksense.scene')
   .controller('SceneController', [
-    '$scope', '$state','$stateParams','$log','$http','mkConfig','$rootScope',
+    '$scope', '$state','$stateParams','$log','$http','mkConfig','$rootScope','$localStorage',
     function controller(
-      $scope, $state,$stateParams,$log,$http,mkConfig,$rootScope
+      $scope, $state,$stateParams,$log,$http,mkConfig,$rootScope,$localStorage
     ){
       var logger=$log.getInstance('SceneController');
       var exhibitionId=$stateParams.exhibitionId;
@@ -36,12 +36,20 @@
       }
 
       $scope.exhibitionId=exhibitionId;
-      $http.get(mkConfig.cmsServer+'exhibition/'+exhibitionId+'/scene/'+sceneId)
-      .then(function(response) {
-        $scope.scene=response.data;
-        $scope.$broadcast('scene',$scope.scene);
-        logger.debug('scene data',$scope.scene);
-      });
+
+      if($localStorage[exhibitionId+'_'+sceneId]){
+          $scope.scene=$localStorage[exhibitionId+'_'+sceneId];
+          $scope.$broadcast('scene',$scope.scene);
+          logger.debug('scene data',$scope.scene);
+      }else{
+        $http.get(mkConfig.cmsServer+'exhibition/'+exhibitionId+'/scene/'+sceneId)
+        .then(function(response) {
+          $scope.scene=response.data;
+          $localStorage[exhibitionId+'_'+sceneId]=$scope.scene;
+          $scope.$broadcast('scene',$scope.scene);
+          logger.debug('scene data',$scope.scene);
+        });
+      }
 
       $scope.$on('$destroy',function(event){
         logger.debug('leave scene room',$rootScope.socketRooms.scene);

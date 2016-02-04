@@ -25,21 +25,50 @@
           camera.position.z=radius*3;
           var renderer = new THREE.WebGLRenderer();
           renderer.setClearColor('#d9d9d9');
+          //renderer.setClearColor('#000000');
           renderer.setPixelRatio($window.devicePixelRatio);
           renderer.setSize(screenInfo.width,screenInfo.height);
           element.append(renderer.domElement);
           var stats = new Stats();
           stats.domElement.style.position = 'absolute';
           stats.domElement.style.top = '0px';
+          stats.domElement.style.opacity = '0';
           element.append(stats.domElement);
           var loader = new THREE.TextureLoader();
           loader.crossOrigin=true;
           var objects,targets,animateId,materials,colDeltas,columns,columnsMobiles;
           populateObjects();
+          scope.comments={};
+          scope.moreinfos={};
 
           scope.$emit("compileDone");
+
+          addLabels();
+          function addLabels(){
+            var container=angular.element('<div class="labels" style="width:'+scope.screenInfo.zoneWidth+'px;height:4%;z-index:1000;position:absolute;bottom:'+Math.floor(scope.configs.gridHeight/10)+'px;left:'+-scope.screenInfo.x+'px"></div>'); 
+            scope.labels.forEach(function(label){
+              var left=label.columnIndex*(scope.configs.columnGap+scope.configs.gridWidth)+Math.floor(scope.configs.columnGap/2+scope.configs.gridWidth/2);
+              container.append('<div style="left:'+left+'px;position:absolute;padding:2px 5px;background:yellow;transform:translate(-50%,0);">'+label.key+'</div>');  
+            })
+            element.append(container);
+          }
+          scope.$on('mobileOut',function(event,mobileOutInfo){
+            var columnIndex=mobileOutInfo.cache;
+            columnsMobiles[columnIndex]--;
+            if(columnsMobiles[columnIndex]<1){
+              var index=getActiveIndexInColumn(columnIndex);
+              $timeout(function(){
+                delete scope.moreinfos[artObjects[index].id];
+                delete scope.comments[artObjects[index].id];
+                scope.$apply();
+              });
+            }
+          });
+
           scope.$on('mobileIn',function(event,mobileInfo){
+            scope.$emit('delay',15000);
             var columnIndex=getMobileInColumnIndex(mobileInfo.screenIndex);
+            console.log('columnIndex',columnIndex);
             columnsMobiles[columnIndex]++;
             var indexes=get9Indexes(columnIndex);
             var objs=indexes.map(function(index){
@@ -47,14 +76,87 @@
             });
             activeObject(columnIndex,indexes[0]);
             scope.$emit('mobileInResponse',{mobileInfo:mobileInfo,payload:{objects:objs,indexes:indexes},cache:columnIndex});
-            scope.$emit('publish',{type:'actionEntry',payload:objs[indexes[0]]});
+            scope.$emit('publish',{type:'actionEntry',payload:objs[0]});
           });
           scope.$on('mobileAction',function(event,mobileActionInfo){
             var event=mobileActionInfo.payload;
             var columnIndex=mobileActionInfo.cache;
+            console.log('columnIndex',columnIndex);
             if(columnIndex !== 0 && !columnIndex){
               scope.$emit('mobileIn',mobileActionInfo.mobileInfo);
             }else{
+              logger.debug(event);
+              if(event.type==='status'){
+                if(event.data==='showComments'){
+                  var index=getActiveIndexInColumn(columnIndex);
+                  var comment={};
+                  var height=0,width=0;
+                  var imgWidth=artObjects[index].cover.width;
+                  var imgHeight=artObjects[index].cover.height;
+                  var gridRatio=configs.gridWidth/configs.gridHeight;
+                  var imgRatio=imgWidth/imgHeight;
+                  if(imgRatio>=gridRatio){
+                    width=configs.gridWidth;
+                    height=Math.floor(width/artObjects[index].cover.width*artObjects[index].cover.height);
+                  }else{
+                    height=configs.gridHeight;
+                    width=Math.floor(height/artObjects[index].cover.height*artObjects[index].cover.width);
+                  }
+                  comment.x=targets[index].position.x-width/2-screenInfo.x;
+                  comment.y=scope.screenInfo.zoneHeight/2-height/2;
+                  comment.width=width;
+                  comment.height=height;
+                  comment.artObject=artObjects[index];
+                  $timeout(function(){
+                    comment.comments=artObjects[index].comments.map(function(c){
+                      return {top:Math.floor(c.position[0]*100)+'%',left:Math.floor(c.position[1]*100)+'%',text:c.text}; 
+                    });
+                    scope.comments[artObjects[index].id]=comment;
+                    logger.debug(scope.comments);
+                    scope.$apply();
+                  });
+                }
+                if(event.data==='hideComments'){
+                  $timeout(function(){
+                    var index=getActiveIndexInColumn(columnIndex);
+                    delete scope.comments[artObjects[index].id];
+                  });
+                }
+                if(event.data==='hideMoreinfo'){
+                  var index=getActiveIndexInColumn(columnIndex);
+                  $timeout(function(){
+                    delete scope.moreinfos[artObjects[index].id];
+                    scope.$apply();
+                  });
+                }
+                if(event.data==='showMoreinfo'){
+                  var index=getActiveIndexInColumn(columnIndex);
+                  var moreinfo={};
+                  var height=0,width=0;
+                  var imgWidth=artObjects[index].cover.width;
+                  var imgHeight=artObjects[index].cover.height;
+                  var gridRatio=configs.gridWidth/configs.gridHeight;
+                  var imgRatio=imgWidth/imgHeight;
+                  if(imgRatio>=gridRatio){
+                    width=configs.gridWidth;
+                    height=Math.floor(width/artObjects[index].cover.width*artObjects[index].cover.height);
+                  }else{
+                    height=configs.gridHeight;
+                    width=Math.floor(height/artObjects[index].cover.height*artObjects[index].cover.width);
+                  }
+                  moreinfo.x=Math.floor(targets[index].position.x+width/2+10)-screenInfo.x;
+                  moreinfo.y=Math.floor(Math.floor(screenInfo.zoneHeight/2)-height/2);
+                  moreinfo.width=scope.configs.columnGap-10*3;
+                  if(moreinfo.width<300)
+                    moreinfo.width=300;
+                  moreinfo.height=height;
+                  moreinfo.artObject=artObjects[index];
+                  $timeout(function(){
+                    scope.moreinfos[artObjects[index].id]=moreinfo;
+                    scope.$apply();
+                  })
+                }
+              }
               if(event.type==='left'){
                 columnsMobiles[columnIndex]--;
                 transformColumn(columnIndex);
@@ -69,7 +171,7 @@
                   return scope.artObjects[index]; 
                 });
                 scope.$emit('mobileActionResponse',{mobileInfo:mobileActionInfo.mobileInfo,payload:{type:'left',objects:objs,indexes:indexes},cache:columnIndex});
-                scope.$emit('publish',{type:'actionEntry',payload:objs[0]});
+                scope.$emit('publish',{type:'actionEntry',payload:scope.artObjects[event.index]});
               }else if(event.type==='right'){
                 columnsMobiles[columnIndex]--;
                 transformColumn(columnIndex);
@@ -84,17 +186,17 @@
                   return scope.artObjects[index]; 
                 });
                 scope.$emit('mobileActionResponse',{mobileInfo:mobileActionInfo.mobileInfo,payload:{type:'right',objects:objs,indexes:indexes},cache:columnIndex});
-                scope.$emit('publish',{type:'actionEntry',payload:objs[0]});
+                scope.$emit('publish',{type:'actionEntry',payload:scope.artObjects[event.index]});
               }else if(event.type==='up'){
                 activeObject(columnIndex,event.index);
                 var indexes=get3Indexes(columnIndex);
                 scope.$emit('mobileActionResponse',{mobileInfo:mobileActionInfo.mobileInfo,payload:{type:'up',objects:[scope.artObjects[indexes[0]]],indexes:[indexes[0]],previousIndex:event.index},cache:columnIndex});
-                scope.$emit('publish',{type:'actionEntry',payload:scope.artObjects[indexes[1]]});
+                scope.$emit('publish',{type:'actionEntry',payload:scope.artObjects[event.index]});
               }else if(event.type==='down'){
                 activeObject(columnIndex,event.index);
                 var indexes=get3Indexes(columnIndex);
                 scope.$emit('mobileActionResponse',{mobileInfo:mobileActionInfo.mobileInfo,payload:{type:'down',objects:[scope.artObjects[indexes[2]]],indexes:[indexes[2]],previousIndex:event.index},cache:columnIndex});
-                scope.$emit('publish',{type:'actionEntry',payload:scope.artObjects[indexes[1]]});
+                scope.$emit('publish',{type:'actionEntry',payload:scope.artObjects[event.index]});
               }
             }
           });
@@ -102,22 +204,20 @@
           function get9Indexes(columnIndex){
             var indexes=[null,null,null,null,null,null,null,null,null];
             var a=get3Indexes(columnIndex);
-            indexes[0]=a[1];
             indexes[3]=a[0];
+            indexes[0]=a[1];
             indexes[7]=a[2];
             var indexB=columnIndex-1;
             if(indexB<0)indexB=columns.length-1;
-            console.log(indexB);
             var b=get3Indexes(indexB);
-            indexes[1]=b[0];
-            indexes[2]=b[1];
+            indexes[2]=b[0];
+            indexes[1]=b[1];
             indexes[8]=b[2];
             var indexC=columnIndex+1;
-            console.log(indexC);
             if(indexC>=columns.length)indexC=0;
             var c=get3Indexes(indexC);
-            indexes[5]=c[0];
-            indexes[4]=c[1];
+            indexes[4]=c[0];
+            indexes[5]=c[1];
             indexes[6]=c[2];
             return indexes;
           }
@@ -289,28 +389,52 @@
             var key=0;
             var counter=0;
 
-            var dict={};
-            artObjects.forEach(function(obj,index){
-              if(obj.cover){
-                if(!dict[key])dict[key]=[];
-                dict[key].push(index);
-              }
-              counter++;
-              if(counter%20===0)
-                key++
-            });
-            return dict;
+            //var dict={};
+            //artObjects.forEach(function(obj,index){
+              //if(obj.cover){
+                //if(!dict[key])dict[key]=[];
+                //dict[key].push(index);
+              //}
+              //counter++;
+              //if(counter%20===0)
+                //key++
+            //});
+            //return dict;
 
             var dict={};
             var groupBy=configs.groupBy;
             artObjects.forEach(function(obj,index){
               var val=eval('obj.'+groupBy);
-              if(val && obj.cover){
+              if(val && obj.cover && obj.cover.width<obj.cover.height){
                 if(!dict[val])dict[val]=[];
                 dict[val].push(index);
               }
             });
+
+            var d={};
+            var div=20;
+            for(var key in dict){
+              if(dict[key].length<div){
+                d[key]=dict[key]; 
+              }else{
+                var count=Math.floor(dict[key].length/div)+1
+                console.log(count);
+                for(var i=0; i<count; i++){
+                  d[key+'-'+(i+1)]=[];
+                  for(var j=i*div; j<(i+1)*div && j<dict[key].length; j++){
+                    d[key+'-'+(i+1)].push(dict[key][j]);
+                  } 
+                }
+              }
+            }
+            dict=d;
             logger.debug('Group data by key',groupBy,dict);
+            var labels=[];
+            for(var key in dict){
+              if(dict[key].length<configs.minimumRowCountInColumn)continue;
+              labels.push({key:key,columnIndex:labels.length}); 
+            }
+            scope.labels=labels;
             return dict;
           }
 
@@ -388,15 +512,20 @@
               .easing(TWEEN.Easing.Cubic.In)
               .start();
               var scale=Math.abs(target.position.y-Math.PI)/Math.PI;
-              if(scale<0.0001)scale=0.0001;
+              if(Math.abs(angle)<0.001){
+                scale=Math.pow(scale,6)*globalScale*1;
+              }else{
+                scale=Math.pow(scale,6)*globalScale
+              }
+              if(scale<0.1)scale=0.1;
               new TWEEN.Tween( object.scale )
-              .to({x:Math.pow(scale,4)*globalScale,y:Math.pow(scale,4)*globalScale,z:1},dt)
+              .to({x:scale,y:scale,z:1},dt)
               //.to({x:Math.pow(scale,4),y:Math.pow(scale,4),z:1},dt)
               .onUpdate(function(){
                 var value=(object.position.z+radius)/2/radius;
                 var opacity=Math.pow(value,100);
-                if(opacity<0.7)
-                  opacity=0.7;
+                if(opacity<0.3)
+                  opacity=0.3;
                 //material.opacity=opacity;
                 material.opacity=opacity*globalScale;
               })
@@ -447,20 +576,6 @@
               columnsMobiles.push(0);
               columnIndex++;
             }
-            return
-            for(var key in gridGroups){
-              for(var col in gridGroups[key]){
-                var delta=Math.PI*2/gridGroups[key][col].length;
-                gridGroups[key][col].forEach(function(objIndex,rowIndex){
-                  var target = new THREE.Object3D();
-                  target.position.x=(columnIndex+0.5)*(configs.gridWidth+configs.columnGap);
-                  target.position.y=rowIndex*delta;
-                  targets[objIndex]=target;
-                });
-                columnIndex++;
-              }
-            }
-            logger.debug(targets);
           }
           //end populateTargets
 

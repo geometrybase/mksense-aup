@@ -16,6 +16,7 @@
           scope.state=$state.current;
           logger.debug(scope.state);
 
+
           var swiper = new Swiper('.swiper-container-h', {
             pagination: '.swiper-container-h>.swiper-pagination',
             longSwipesRatio:0.3,
@@ -39,8 +40,16 @@
             scope.$emit('artObject',swipers[swiper.activeIndex].slides[swipers[swiper.activeIndex].activeIndex].artObject);
           });
 
-
+          if(scope.mobileInResponse){
+            $timeout(function(){
+              mobileInResponse(scope.mobileInResponse);
+            },1);
+          }
           scope.$on('mobileInResponse',function(event,res){
+            mobileInResponse(res);
+          });
+
+          function mobileInResponse(res){
             swiper.removeAllSlides();
             var objects=res.payload.objects;
             var indexes=res.payload.indexes;
@@ -77,7 +86,7 @@
                 scope.$emit('artObject',s.slides[s.activeIndex].artObject);
               });
             });
-          });
+          }
 
           function printSwiperIndexes(){
             for(var i=0; i<3; i++){
@@ -137,7 +146,7 @@
                 currentSwiper.removeSlide(2);
                 currentSwiper.prependSlide(s);
               }
-              if(res.payload.type==='down' && currentSwiper.isBeginning && previousIndex === currentIndex){
+              if(res.payload.type==='down' && currentSwiper.isEnd && previousIndex === currentIndex){
                 var s=currentSwiper.slides[0]; 
                 s.index=indexes[0];
                 s.artObject=objects[0];

@@ -1,0 +1,194 @@
+<div style="z-index:3;font-size:10px;">
+  <div ng-repeat="(id,comment) in comments" class="comments" ng-style="{position:'absolute',width:comment.width+'px',height:comment.height+'px',top:comment.y+'px',left:comment.x+'px'}">
+    <div ng-repeat="c in comment.comments" ng-style="{left:c.left,top:c.top,position:'absolute'}">{{c.text}}{{c.top}}{{c.left}}</div>
+  </div>
+  <div ng-repeat="(id,moreinfo) in moreinfos" ng-style="{position:'absolute',width:moreinfo.width+'px',height:moreinfo.height+'px',top:moreinfo.y+'px',left:moreinfo.x+'px'}">
+    <div ng-if="moreinfo.width>moreinfo.height" ng-style="{width:moreinfo.width+'px',height:moreinfo.height+'px','box-sizing':'border-box',padding:'2em',position:'relative'}">
+      <div style="width:100%;height:100%;box-sizing:border-box;padding-right:11em;padding-bottom:6.25em;">
+        <div style="width:100%;height:100%;overflow:scroll;">
+          <p class="title">{{moreinfo.artObject.title}}</p>
+          <p class="details">Medium: {{moreinfo.artObject.physicalMedium}}</p>
+          <p class="description">{{moreinfo.artObject.description}}</p>
+        </div>
+      </div>
+      <div style="width:100%;box-sizing:border-box;padding-right:13em;padding-bottom:1.25em;padding-left:4.8em;position:absolute;left:0px;bottom:0px;">
+        <div style="box-sizing: border-box; padding-left:2em; padding-top:1.25em;width:4.8em;position:absolute;top:0;left:0;">
+          <div style="background-image:url('http://img.name2012.com/uploads/allimg/2015-06/30-023131_451.jpg')" class="circular"></div>
+        </div>
+        <div style="width:100%;height:100%;overflow:hidden;padding-top:1.25em;padding-left:1.25em">
+          <div style="display:inline;" class="socialId">CHEN</div>
+          <div style="font-size:1em; font-family: 'dinLight';display:inline; right:0px; float:right;padding-top:0.5em; padding-right:1.25em;">12 November 1928</div>
+          <div style="display:table-cell;width:80%;" class="comment">COMMENT ME</div>
+        </div>
+      </div>
+      <div style="width:11em;position:absolute;right:0;top:0;padding:2em 2em 2em 1em;height:100%;box-sizing:border-box;">
+        <div style="width:100%;height:100%;overflow:hidden">
+          <div style="display:table;width:100%;height:100%;">
+            <div style="display:table-cell;vertical-align:middle;">
+              <!--<div style="text-align:center;background:white;"><img ng-src="{{moreinfo.artObject.cover.url}}?imageView2/2/w/300/h/300" style="width:100%;"></div>-->
+              <div style="text-align:center;background:white;padding-bottom:0.5em;padding-top:0.5em">
+                <img src="http://assets.mksense.cn/hear.svg" style="width:2.5em;height:2.5em;padding-bottom:0.2em;">
+                <p style="font-size:0.8em; font-family: 'din';  color:#989898; width:100%; text-align: center;margin:0;padding:0; ">82 likes</p>
+              </div>
+              <div style="text-align:center;background:white;padding-bottom:0.5em;padding-top:0.5em">
+                <img src="http://assets.mksense.cn/comment.svg" style="width:2.5em;height:2.5em;padding-bottom:0.2em;">
+                <p style=" font-size:0.8em; font-family: 'din';  color:#989898; width:100%; text-align: center;margin:0;padding:0; ">12 comments</p>
+              </div>
+              <div style="text-align:center;background:white;padding-bottom:0.5em;padding-top:0.5em">
+                <img src="http://assets.mksense.cn/collect.svg" style="width:2.5em;height:2.5em;padding-bottom:0.2em;">
+                <p style="font-size:0.8em; font-family: 'din'; color:#989898; width:100%; text-align: center; margin:0;padding:0; ">3 collects</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div ng-if="moreinfo.width<moreinfo.height" ng-style="{width:moreinfo.width+'px',height:moreinfo.height+'px','box-sizing':'border-box',padding:'2em',position:'relative'}">
+      <div style="width:100%;height:100%;box-sizing:border-box;padding-bottom:14.25em">
+        <div style="width:100%;height:100%;overflow-y:scroll;">
+          <p class="title">{{moreinfo.artObject.title}}</p>
+          <p class="details">Medium: {{moreinfo.artObject.physicalMedium}}</p>
+          <p class="description">{{moreinfo.artObject.description}}</p>
+        </div>
+      </div>
+      <div style="width:100%;box-sizing:border-box;padding-right:2em;padding-bottom:1.25em;padding-left:4.8em;position:absolute;left:0em;bottom:10em;">
+        <div style="box-sizing: border-box; padding-left:2em; padding-top:1.25em;width:4.8em;position:absolute;top:0;left:0;">
+          <div style="background-image:url('http://img.name2012.com/uploads/allimg/2015-06/30-023131_451.jpg')" class="circular"></div>
+        </div>
+        <div style="width:100%;height:100%;overflow:hidden;padding-top:1.25em;padding-left:1.25em">
+          <div style="display:inline;" class="socialId">CHEN</div>
+          <div style="font-size:1em; font-family: 'dinLight';display:inline; right:0px; float:right;padding-top:0.5em; padding-right:1.25em;">12 November 1928</div>
+          <div style="display:table-cell;width:80%;" class="comment">COMMENT ME</div>
+        </div>
+      </div>
+      <div style="height:8em;width:100%;position:absolute;right:0;bottom:2em;padding:0em 2em 0em 2em;box-sizing:border-box;">
+        <div style="height:8em;display:table;margin:0 auto;">
+          <div style="display:table-row;height:em;">
+            <!--<div style="display:table-cell;height:100%;"><img ng-src="{{moreinfo.artObject.cover.url}}?imageView2/2/w/      300/h/300" style="height:8em;width:auto;"></div>-->
+            <div style="display:table-cell;vertical-align:middle;height:100%;width:7em;text-align:center;">
+              <img src="http://assets.mksense.cn/hear.svg" style="width:2.5em;height:2.5em;padding-bottom:0.2em;">
+              <p style="font-size:0.8em; font-family: 'din';  color:#989898; width:100%; text-align: center;margin:0;padding:0; ">82 likes</p>
+            </div>
+            <div style="display:table-cell;vertical-align:middle;height:100%;width:7em;text-align:center;">
+              <img src="http://assets.mksense.cn/comment.svg" style="width:2.5em;height:2.5em;padding-bottom:0.2em;">
+              <p style=" font-size:0.8em; font-family: 'din';  color:#989898; width:100%; text-align: center;margin:0;padding:0; ">12 comments</p>
+            </div>
+            <div style="display:table-cell;vertical-align:middle;height:100%;width:7em;text-align:center;">
+              <img src="http://assets.mksense.cn/collect.svg" style="width:2.5em;height:2.5em;padding-bottom:0.2em;">
+              <p style="font-size:0.8em; font-family: 'din'; color:#989898; width:100%; text-align: center; margin:0;padding:0; ">3 collects</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+  @font-face {
+  font-family: din;
+  src: url("http://7xlzrj.com1.z0.glb.clouddn.com/DIN%20Medium.ttf") /* TTF file for CSS3 browsers */
+}
+@font-face {
+  font-family: dinLight;
+  src: url("http://7xlzrj.com1.z0.glb.clouddn.com/DIN%20Light.ttf") /* TTF file for CSS3 browsers */
+}
+p.title{
+  color:black;
+  font-weight: normal;
+  font-size:2.5em;
+  font-family: 'din';
+  line-height:1.2em;
+  text-align: left;
+  padding: 0px;
+  margin-top: 0px;
+  margin-bottom: 25px;
+}
+p.details{
+  font-size:1.1em;
+  font-family: 'din';
+  line-height:1.6em;
+  color:red;
+  text-align: left;
+  margin:0;
+}
+p.description{
+  position: relative;
+  font-size:1.3em;
+  font-family: 'dinLight';
+  line-height:2.5em;
+  color:black;
+  text-align: left;
+  overflow: scroll;
+}
+.comment{
+  font-size:0.8em;
+  font-family: 'din';
+  line-height:2.5em;
+  text-align: left;
+}
+.socialId{
+  font-size:0.9em;
+  font-family: 'din';
+  line-height:2.5em;
+  text-align: left;
+}
+.circular {
+  width:2.8em; height:2.8em;
+  border-radius:1.4em;
+  background: url(http://img.name2012.com/uploads/allimg/2015-06/30-023131_451.jpg) no-repeat;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+::-webkit-scrollbar {
+  display: none;
+}
+.table{
+  display:table; 
+}
+.row{
+  display:table-row; 
+}
+.col{
+  display:table-cell; 
+}
+.comments{
+  transition: opacity .5s ease-in-out 0s;
+  width: 100%;
+  height: 100%;
+  font-weight: normal;
+  font-size: 18px;
+  font-family: 'din';
+  line-height: 1.5;
+}
+.comments div{
+  display: inline-block;
+  max-width: 400px;
+  font-family: 'dinLight';
+  position: absolute;
+  padding: 0 10px;
+  text-align: center;
+  background-color: rgba(0,0,0,0.7);
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  color: white;
+  transform: translate(-50%,-100%);
+}
+.comments div:after{
+  padding-left: -20px;  
+  opacity:0.7;             
+  content: '';             
+  position: absolute;   
+  border-style: solid;  
+  border-width: 10px 10px 0;
+  border-color: #000000 transparent;
+  display: block;          
+  width: 0;                
+  z-index: 1;              
+  bottom: -10px;           
+  left: 50%;               
+  /*left: 55px;*/          
+  transform:translate(-10px,-1.5px) ;
+}              
+</style>

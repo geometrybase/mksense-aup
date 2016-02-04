@@ -46,6 +46,10 @@
           scope.$on('joinScreen',function(event,screenRoom){
             socketReady(screenRoom);
           });
+          scope.$on('delay',function(event,time){
+            time=time?time:10000;
+            delay(time);
+          });
 
           function sceneReady(scene){
             if(!SCREEN.scene && scene){
@@ -172,9 +176,13 @@
               scope.$broadcast('pubusb',data);  
             });
 
-            scope.$on('pubsub',function(event,data){
+            scope.$on('publish',function(event,data){
               if(SCREEN.isMaster)
                 SCREEN.peerConnection.publishToScenes(data);
+            });
+            scope.$on('sync',function(event,data){
+              if(SCREEN.isMaster)
+                SCREEN.peerConnection.publishToScreens(data);
             });
 
             pc.on('screenData',function(conn,data){
@@ -316,6 +324,24 @@
               fadeOut();
               SCREEN.peerConnection.publishToScreens({type:'action',name:'fadeOut'}); 
             },time);
+          }
+
+          function delay(time){
+            logger.debug('delay',time);
+            var delta=SCREEN.fadeInTime+SCREEN.scene.timeline[SCREEN.visualIndex]-Date.now();
+            if(time<delta){
+              logger.debug(delta+'ms left,','more than you want');
+              return; 
+            }else{
+              $timeout.cancel(SCREEN.timer);
+              SCREEN.timer=$timeout(function(){
+                SCREEN.visualStatus="fadeOut";
+                SCREEN.fadeOutStatus=SCREEN.peerConnection.getConnectionDict(false,'SCREEN');
+                SCREEN.fadeOutStatus[SCREEN.peerConnection.peerId]=false;
+                fadeOut();
+                SCREEN.peerConnection.publishToScreens({type:'action',name:'fadeOut'}); 
+              },time);
+            }
           }
 
           //scope.$on('fadeOutDone',function(){

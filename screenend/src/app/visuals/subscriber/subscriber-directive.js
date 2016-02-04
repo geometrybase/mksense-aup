@@ -25,59 +25,43 @@
           scope.css3dObjects=[];
           scope.renderer=new CSS3DRenderer();
           scope.renderer.domElement.css('position','absolute');
-          scope.renderer.domElement.style.height=Math.floor(scope.screenInfo.height*0.7)+'px';
+          scope.renderer.domElement.css('height',Math.floor(scope.screenInfo.height*0.7)+'px');
           element.append(scope.renderer.domElement);
 
-          scope.status="PENDING";
-
-          scope.$on('fadeIn',function(event,index){
+          scope.$on('fadeIn',function(){
             element.css('opacity','1');
-            logger.debug('fade in');
-            logger.debug(index,scope.index);
-            logger.debug(scope.status);
-            if(scope.index !== index)
-              return;
-            if(scope.status === "PLAY")
-              return;
-            scope.status="PLAY";
-            logger.debug('Catch fadeIn event');
-            cancelAnimationFrame(scope.animateId);
-            //animate();
+            cancelAnimationFrame(scope.tweenAnimationId);
+            transform(TWEEN.Easing.Cubic.InOut);
           });
 
-          scope.$on('fadeOut',function(event,index){
-            if(scope.index !== index)
-              return;
-            if(scope.status==="FADEOUT")
-              return;
-            scope.status="FADEOUT";
-            logger.debug('Catch fadeOut event for index',index);
+          scope.$on('fadeOut',function(){
             element.css('opacity','0');
             $timeout(function(){
-              cancelAnimationFrame(scope.animateId);
-              scope.$emit('fadeOutDone',index);
-            },5000);
+              cancelAnimationFrame(scope.tweenAnimationId);
+              TWEEN.removeAll();
+              scope.$emit('fadeOutDone');
+            },3000);
           });
 
           scope.$on('$destroy',function(){
-            cancelAnimationFrame(scope.animateId);
+            cancelAnimationFrame(scope.tweenAnimationId);
           });
-
 
           scope.$on('pubsub',function(event,data){
+            console.log(data);
             if(scope.isMaster){
-              //scope.$emit('syncData',data);
-              addArtObject(data);
+              if(data.type==='actionEntry')
+                addArtObject(data.payload);
+              scope.$emit('sync',{type:'data',name:'syncData',payload:data.payload});
             }
           });
 
-          scope.$on('syncData',function(event,message){
-            if(message.index === scope.index){
-              addArtObject(message.data.payload);
-            }
+          scope.$on('syncData',function(event,payload){
+              addArtObject(payload);
           });
 
           function addArtObject(artObject){
+            logger.debug(artObject);
             var imageHeight=scope.screenInfo.zoneHeight;
             var imageWidth=Math.floor(scope.screenInfo.zoneHeight/artObject.cover.height*artObject.cover.width);
             console.log(imageWidth);
@@ -99,11 +83,6 @@
             transform(TWEEN.Easing.Cubic.InOut);
           }
 
-          function animate(){
-            scope.animateId=requestAnimationFrame(animate)
-            TWEEN.update();
-            //render();
-          }
 
           function render(){
             scope.renderer.render(scope.css3dScene,scope.screenInfo);
@@ -120,7 +99,7 @@
             var objects=scope.css3dObjects;
             var targets=scope.css3dTargets;
             console.log(targets);
-            var duration=2000;
+            var duration=5000;
             objects.forEach(function(object,index){
               var target=targets[index];
               logger.debug(target);
@@ -137,6 +116,7 @@
               cancelAnimationFrame(scope.tweenAnimationId);
             })
             .start();
+
             cancelAnimationFrame(scope.tweenAnimationId);
             tweenAnimate();
           }

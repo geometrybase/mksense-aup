@@ -32,7 +32,7 @@
           element.css('width',scope.screenInfo.width+"px");
           element.css('height',scope.screenInfo.height+"px");
           element.css('display','none');
-          element.css('transition','opacity 2s cubic-bezier(0.55, 0.06, 0.68, 0.19)');
+          element.css('transition','opacity 1s cubic-bezier(0.55, 0.06, 0.68, 0.19)');
           //element.css('background','black');
           scope.configs=adaptConfigs();
           scope.keyGroups=groupByKey();
@@ -43,23 +43,23 @@
           scope.renderer=new CSS3DRenderer();
           scope.renderer.domElement.css('position','absolute');
           element.append(scope.renderer.domElement);
-          addLables();
+          addLabels();
           scope.status="PENDING";
           scope.$emit("compileDone",scope.sequenceIndex);
 
-          function addLables(){
-            var container=angular.element('<div class="labels" style="width:100%;height:10%;z-index:1000;position:absolute;bottom:'+Math.floor(scope.configs.gridHeight/2)+'px;"></div>'); 
+          function addLabels(){
+            var container=angular.element('<div class="labels" style="width:'+scope.screenInfo.zoneWidth+'px;height:5%;z-index:1000;position:absolute;bottom:'+Math.floor(scope.configs.gridHeight/2)+'px;left:'+-scope.screenInfo.x+'px"></div>'); 
             var index=0;
-            for(var key in scope.keyGroups){
-              var col=scope.keyGroups[key]; 
+            for(var key in scope.gridGroups){
               var left=index*(scope.configs.columnGap+scope.configs.gridWidth)+Math.floor(scope.configs.columnGap/2);
               container.append('<div style="left:'+left+'px;position:absolute;padding:2px 5px;background:yellow;">'+key+'</div>');  
-              index+=col.length
+              index+=scope.gridGroups[key].length;
             }
             element.append(container);
           }
 
           var mobileIn=scope.$on('mobileIn',function(event,mobileInfo){
+            scope.$emit('delay',15000);
             logger.debug('mobileIn',mobileInfo);
             var index=getCenterIndex(mobileInfo.screenIndex);
             var indexes=get9Indexes(index);
@@ -88,6 +88,7 @@
           }
 
           scope.$on('mobileAction',function(e,mobileActionInfo){
+            scope.$emit('delay',15000);
             var event=mobileActionInfo.payload;
             var lastObject=mobileActionInfo.cache;
             if(!lastObject){
@@ -285,13 +286,13 @@
               if(t && t.position.y<scope.screenInfo.zoneHeight)
                 t.position.y=random()*scope.screenInfo.zoneHeight*10+scope.screenInfo.zoneHeight*2;
             });
-            transform(TWEEN.Easing.Bounce.Out);
+            transform(TWEEN.Easing.Bounce.Out,2000);
             element.css('opacity','0');
             $timeout(function(){
               TWEEN.removeAll();
               cancelAnimationFrame(scope.animateId);
               scope.$emit('fadeOutDone',scope.sequenceIndex);
-            },5000);
+            },3000);
           });
 
           scope.$on('$destroy',function(){
@@ -461,7 +462,7 @@
                   //var back=angular.element('<div class="back" style="width:'+imgWidth+'px;height:'+imgHeight+'px;box-sizing:border-box;padding:2em;"></div>');
                   var back=angular.element('<div class="back" style="width:'+imgWidth+'px;height:'+imgHeight+'px;"></div>');
                   var backMore=angular.element('<div class="more"></div>');
-                  var backText=angular.element('<div style="width:100%;height:100%;box-sizing:border-box;padding-bottom:14.25em"><div style="width:100%;height:100%;overflow-y:scroll;"><p class="title">'+artObjects[objIndex].title+'</p><p class="details">'+artObjects[objIndex].physicalMedium+'</p><p class="description">'+artObjects[objIndex].description+'</p></div></div>');
+                  var backText=angular.element('<div style="width:100%;height:100%;box-sizing:border-box;padding-bottom:14.25em"><div style="width:100%;height:100%;overflow-y:scroll;"><p class="title">'+artObjects[objIndex].title+'</p><p class="details">medium: '+artObjects[objIndex].physicalMedium+'</p><p class="description">'+artObjects[objIndex].description+'</p></div></div>');
                   var backComment=angular.element('<div style="width:100%;box-sizing:border-box;padding-right:2em;padding-bottom:1.25em;padding-left:4.8em;position:absolute;left:0em;bottom:10em;"><div style="box-sizing: border-box; padding-left:2em; padding-top:1.25em;width:4.8em;position:absolute;top:0;left:0;"><div style="background-image:url(\'http://img.name2012.com/uploads/allimg/2015-06/30-023131_451.jpg\')" class="circular"></div></div><div style="width:100%;height:100%;overflow:hidden;padding-top:1.25em;padding-left:1.25em"><div style="display:inline;" class="socialId">CHEN</div><div style="font-size:1em; font-family: \'dinLight\';display:inline; right:0px; float:right;padding-top:0.5em; padding-right:1.25em;">'+'12 November 1928'+'</div><div style="display:table-cell;width:80%;" class="comment">'+'COMMENT ME'+'</div></div>');
                   var backBar=angular.element('<div style="height:8em;width:100%;position:absolute;right:0;bottom:2em;padding:0em 2em 0em 2em;box-sizing:border-box;"><div style="height:8em;display:table;margin:0 auto;background:white;"><div style="display:table-row;height:em;"><div style="display:table-cell;height:100%;"><img src="http://7xq46r.com1.z0.glb.clouddn.com/22963e4619653e62feb73c5722c4a62d09b73bc9.jpg?imageView2/2/w/300/h/300" style="height:8em;width:auto;"></div><div style="display:table-cell;vertical-align:middle;height:100%;width:7em;text-align:center;"><img src="http://assets.mksense.cn/hear.svg" style="width:2.5em;height:2.5em;padding-bottom:0.2em;"><p style="font-size:0.8em; font-family: \'din\';  color:#989898; width:100%; text-align: center;margin:0;padding:0; ">'+'82 likes'+'</p></div><div style="display:table-cell;vertical-align:middle;height:100%;width:7em;text-align:center;"><img src="http://assets.mksense.cn/comment.svg" style="width:2.5em;height:2.5em;padding-bottom:0.2em;"><p style=" font-size:0.8em; font-family: \'din\';  color:#989898; width:100%; text-align: center;margin:0;padding:0; ">'+'12 comments'+'</p></div><div style="display:table-cell;vertical-align:middle;height:100%;width:7em;text-align:center;"><img src="http://assets.mksense.cn/collect.svg" style="width:2.5em;height:2.5em;padding-bottom:0.2em;"><p style="font-size:0.8em; font-family: \'din\'; color:#989898; width:100%; text-align: center; margin:0;padding:0; ">'+'3 collects'+'</p></div></div></div></div>');
 
@@ -514,6 +515,7 @@
             var labels=[]
             for(var key in gridGroups){
               labels.push({key:key,columnIndex:columnIndex});
+              logger.debug(key,gridGroups[key]);
               for(var col in gridGroups[key]){
                 gridGroups[key][col].forEach(function(objIndex,rowIndex){
                   var target = new THREE.Object3D();
@@ -530,6 +532,7 @@
             }
             scope.css3dTargets=targets;
             scope.labels=labels;
+            logger.debug(labels);
           };
 
           function centerActive(index,upDown){
@@ -659,11 +662,11 @@
             render();
           }
 
-          function transform(easing){
+          function transform(easing,duration){
             TWEEN.removeAll();
             var objects=scope.css3dObjects;
             var targets=scope.css3dTargets;
-            var duration=1000;
+            duration=duration?duration:1000;
             objects.forEach(function(object,index){
               var target=targets[index];
               if(!target)return;

@@ -18,6 +18,7 @@
           element.css('height','100%');
           element.css('cursor','none')
           element.css('border-bottom','solid red 1px');
+          element.css('transition','opacity 2s cubic-bezier(0.55, 0.06, 0.68, 0.19)');
 
           scope.artObjects=scope.artObjects.slice(0,500);
 
@@ -37,14 +38,21 @@
           var currentPositions=[];
 
           scope.artObjects.forEach(function(obj){
-            if(obj && obj.cover){
+            if(obj && obj.cover && obj.cover.width/obj.cover.height<3){
               totalLength+=obj.cover.width*scope.screenInfo.zoneHeight/obj.cover.height+gap;
             }
           });
 
           var lastX=0;
+          scope.artObjects.sort(function(a,b){
+            if(a.dating && b.dating){
+              return (a.dating.year-b.dating.year);
+            }else{
+              return 0; 
+            }
+          });
           scope.artObjects.forEach(function(obj,index){
-            if(obj && obj.cover){
+            if(obj && obj.cover && obj.cover.width/obj.cover.height<3){
                xSteps.push(lastX); 
                indexes.push(index);
                widths.push(obj.cover.width*scope.screenInfo.zoneHeight/obj.cover.height/totalLength*scope.screenInfo.zoneWidth);
@@ -61,8 +69,8 @@
           
           var canvas = d3.select(element[0]).append('div')
           .style('width',width+'px')
-          .style('height',Math.floor(height*0.7)+'px')
-          .style('padding-top',Math.floor(height*0.1)+'px')
+          .style('height',Math.floor(height*0.85)+'px')
+          .style('padding-top',Math.floor(height*0.05)+'px')
           .style('position','absolute')
           .style('top','0px')
           .style('left',-scope.screenInfo.x+'px');
@@ -70,18 +78,31 @@
           var labelContainer=d3.select(element[0])
           .append('div')
           .style('width','100%')
-          .style('height',Math.floor(height*0.2)+'px')
+          .style('height',Math.floor(height*0.1)+'px')
           .style('position','absolute')
-          .style('top',Math.floor(height*0.8)+'px')
-          .style('left',-scope.screenInfo.x+'px');
+          .style('top',Math.floor(height*0.9)+'px')
+          .style('left',-scope.screenInfo.x+'px')
+          .style('transition','opacity 2s cubic-bezier(0.55, 0.06, 0.68, 0.19)');
+
+          var rndYs=indexes.map(function(){
+            var h=Math.random()-0.5; 
+            if(h>0){
+              return scope.screenInfo.zoneHeight*(2+h); 
+            }else{
+              return scope.screenInfo.zoneHeight*(h-1); 
+            }
+          });
 
           var images = canvas.selectAll('.fisheye-image')
           .data(indexes)
           .enter().append('div')
           .attr('class','fisheye-image')
-          .style('height',Math.floor(height*0.7)+'px')
+          .style('height',Math.floor(height*0.85)+'px')
           .style('left',function(d,index){
             return xFisheye(xSteps[index])+'px'; 
+          })
+          .style('top',function(d,index){
+            return rndYs[index]+'px'; 
           })
           .style("width", function(d,index){
             return (xFisheye(xSteps[index+1])-xFisheye(xSteps[index]))+'px'; 
@@ -137,6 +158,17 @@
             //}
           //});
 
+          function animateOut(){
+            images.transition()
+            .duration(2000)
+            .style('left',function(d,index){
+              return xFisheye(xSteps[index])+'px'; 
+            })
+            .style('top',function(d,index){
+              return Math.floor(scope.screenInfo.zoneHeight*0.1+rndYs[index])+'px'; 
+            });
+          }
+
 
           function redraw() {
             maxIndex=-1;
@@ -146,7 +178,8 @@
             .style('left',function(d,index){
               return xFisheye(xSteps[index])+'px'; 
             })
-            .style("width", function(d,index){
+            .style('top',Math.floor(scope.screenInfo.zoneHeight*0.1)+'px')
+            .style('width', function(d,index){
               return (xFisheye(xSteps[index+1])-xFisheye(xSteps[index]))+'px'; 
             });
 
@@ -189,7 +222,7 @@
           }
 
           scope.$on('mobileIn',function(event,mobileInfo){
-
+            scope.$on('delay',1500);
             logger.debug('mobileIn',mobileInfo);
             if(maxIndex === -1)
               return logger.error('mobileIn error,there is no max width image in this visual'); 
@@ -207,18 +240,23 @@
           });
 
           scope.$on('mobileAction',function(event,mobileActionInfo){
-            if(mobileActionInfo.payload.type==='next')
+            scope.$on('delay',1500);
+            if(mobileActionInfo.payload.type==='next'){
               scope.$emit('mobileActionResponse',{mobileInfo:mobileActionInfo.mobileInfo,payload:{
                 type:'next',
                 object:scope.artObjects[indexes[mobileActionInfo.payload.index+1]],
                 index:mobileActionInfo.payload.index+1
               }});
-            if(mobileActionInfo.payload.type==='prev')
+              scope.$emit('publish',{type:'actionEntry',payload:scope.artObjects[indexes[mobileActionInfo.payload.index]]});
+            }
+            if(mobileActionInfo.payload.type==='prev'){
               scope.$emit('mobileActionResponse',{mobileInfo:mobileActionInfo.mobileInfo,payload:{
                 type:'prev',
                 object:scope.artObjects[indexes[mobileActionInfo.payload.index-1]],
                 index:mobileActionInfo.payload.index-1
               }});
+              scope.$emit('publish',{type:'actionEntry',payload:scope.artObjects[indexes[mobileActionInfo.payload.index]]});
+            }
 
             var focus=(xSteps[mobileActionInfo.payload.index]+widths[mobileActionInfo.payload.index]/2);
             logger.debug(focus);
@@ -232,10 +270,14 @@
 
           scope.$on('fadeIn',function(event){
             element.css('opacity','1');
+            labelContainer.style('opacity',1);
+            redraw();
           });
 
           scope.$on('fadeOut',function(event){
+            animateOut();
             element.css('opacity','0');
+            labelContainer.style('opacity',0);
             $timeout(function(){
               scope.$emit('fadeOutDone');
             },1000);
